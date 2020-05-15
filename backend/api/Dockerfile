@@ -3,6 +3,8 @@ FROM golang:1.14 AS builder
 WORKDIR /go/app
 ARG arch=amd64
 ARG arm
+COPY go.mod go.sum /go/app/
+RUN go mod download
 COPY . /go/app/
 RUN GOOS=linux GOARCH=${arch} GOARM=${arm} CGO_ENABLED=0 go build -a -o app /go/app/api
 

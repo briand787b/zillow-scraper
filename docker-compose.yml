@@ -1,7 +1,7 @@
 version: "3.7"
 
 services:
-  zscraper-backend:
+  backend:
     image: zscraper-backend
     build: 
       context: ./backend
@@ -16,7 +16,7 @@ services:
       - redis
 
   redis:
-    image: redis:6.0.1
+    image: redis:6.0
     volumes:
       - redis_data:/data
     networks:
