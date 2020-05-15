@@ -1,0 +1,17 @@
+version: "3.7"
+
+services:
+  redis:
+    image: redis:6.0.1
+    ports: 
+      - 6379:6379
+    volumes:
+      - redis_data:/data
+    networks:
+      - private-net
+
+volumes: 
+  redis_data:
+
+networks:
+  private-net:
