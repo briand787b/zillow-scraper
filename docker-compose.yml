@@ -1,17 +1,30 @@
 version: "3.7"
 
 services:
+  zscraper-backend:
+    image: zscraper-backend
+    build: 
+      context: ./backend
+      args:
+        - arch=amd64
+      dockerfile: ./api/Dockerfile 
+    command: [ "/root/app", "--port", "8000" ]
+    networks:
+      - public
+      - private
+    depends_on: 
+      - redis
+
   redis:
     image: redis:6.0.1
-    ports: 
-      - 6379:6379
     volumes:
       - redis_data:/data
     networks:
-      - private-net
+      - private
 
 volumes: 
   redis_data:
 
 networks:
-  private-net:
+  public:
+  private:

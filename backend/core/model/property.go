@@ -1,6 +1,10 @@
 package model
 
-import "context"
+import (
+	"context"
+
+	"github.com/pkg/errors"
+)
 
 // Status enumerates the statuses a property can be in
 type Status int
@@ -28,5 +32,5 @@ type Property struct {
 
 // Add adds a new Capture to a Property
 func (p *Property) Add(ctx context.Context, as PropertyStore, c *Capture) error {
-
+	return errors.New("NOT IMPLEMENTED")
 }

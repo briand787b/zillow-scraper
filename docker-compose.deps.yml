@@ -1,0 +1,16 @@
+version: "3.7"
+
+services:
+  backend-upgrade:
+    build:
+      context: ./backend
+      args:
+        - arch=amd64
+      dockerfile: ./api/Dockerfile
+      target: builder
+    command: [ "echo", "done" ]
+    volumes: 
+      - type: bind
+        source: ./backend
+        target: /go/app
+
