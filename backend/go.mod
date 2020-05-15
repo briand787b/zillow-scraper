@@ -7,6 +7,7 @@ require (
 	github.com/go-chi/render v1.0.1
 	github.com/go-redis/redis/v7 v7.2.0
 	github.com/google/uuid v1.1.1
+	github.com/k0kubun/colorstring v0.0.0-20150214042306-9440f1994b88 // indirect
 	github.com/mattn/go-colorable v0.1.6 // indirect
 	github.com/onsi/ginkgo v1.12.0 // indirect
 	github.com/onsi/gomega v1.10.0 // indirect
