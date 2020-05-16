@@ -22,11 +22,12 @@ const (
 type Capture struct {
 	Price   uint
 	Acreage uint
-	Status
+	Status  Status
 }
 
 // Property represents a Property
 type Property struct {
+	URL      string
 	Captures []Capture
 }
 

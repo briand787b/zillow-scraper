@@ -1,4 +1,4 @@
-module zcrape
+module zcrapr
 
 go 1.12
 

@@ -1,8 +1,8 @@
 package controller
 
 import (
-	"zcrape/core/model"
-	"zcrape/core/plog"
+	"zcrapr/core/model"
+	"zcrapr/core/plog"
 )
 
 // PropertyController controls the flow of HTTP routes for Property resources

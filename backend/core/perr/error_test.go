@@ -5,8 +5,8 @@ import (
 	"database/sql"
 	"testing"
 
-	"zcrape/core/perr"
-	"zcrape/core/plog/plogtest"
+	"zcrapr/core/perr"
+	"zcrapr/core/plog/plogtest"
 
 	"github.com/pkg/errors"
 )

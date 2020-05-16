@@ -3,7 +3,7 @@ package plogtest
 import (
 	"context"
 
-	"zcrape/core/plog"
+	"zcrapr/core/plog"
 )
 
 const (

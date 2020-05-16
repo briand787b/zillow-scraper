@@ -3,7 +3,7 @@ package util_test
 import (
 	"testing"
 
-	"zcrape/core/util"
+	"zcrapr/core/util"
 )
 
 func TestStrPtr(t *testing.T) {

@@ -6,7 +6,7 @@ import (
 	"sync"
 	"testing"
 
-	"zcrape/core/plog/plogtest"
+	"zcrapr/core/plog/plogtest"
 )
 
 func TestConcurrentLoggerWrites(t *testing.T) {

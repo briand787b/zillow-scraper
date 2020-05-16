@@ -5,8 +5,8 @@ import (
 	"log"
 	"os"
 
-	"zcrape/api/controller"
-	"zcrape/core/plog"
+	"zcrapr/api/controller"
+	"zcrapr/core/plog"
 
 	"github.com/google/uuid"
 )

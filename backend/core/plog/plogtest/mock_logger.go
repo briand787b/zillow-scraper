@@ -5,7 +5,7 @@ import (
 	"io"
 	"sync"
 
-	"zcrape/core/plog"
+	"zcrapr/core/plog"
 )
 
 var _ plog.Logger = &MockLogger{}

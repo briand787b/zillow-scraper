@@ -1,6 +1,6 @@
 package plogtest
 
-import "zcrape/core/plog"
+import "zcrapr/core/plog"
 
 var _ plog.LogWriter = &SpyLogWriter{}
 
