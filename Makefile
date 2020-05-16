@@ -1,5 +1,5 @@
 run:
-	docker-compose down
+	docker-compose down --remove-orphans
 	docker-compose build
 	docker-compose config
 	docker-compose up -d
