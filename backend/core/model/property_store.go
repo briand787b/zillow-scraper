@@ -10,4 +10,12 @@ type PropertyStore interface {
 	GetPropertyByID(ctx context.Context, id string) (*Property, error)
 	InsertCaptureByPropertyID(ctx context.Context, propID string, c *Capture) error
 	InsertProperty(ctx context.Context, p *Property) error
+
+	// TODO
+	// GetPropertyByURL(ctx context.Context, url string)
+	// convert GetPropertyByID to GetPropertiesByIDs to work better w/ GetAllPropertyIDs
+	// FUTURE
+	// experiment with putting Property IDs behind a sorted set - may have better
+	// performace when searching (index-like), though it does require a 2nd degree
+	// of searching (sorted-set -> propID -> prop hash)
 }
