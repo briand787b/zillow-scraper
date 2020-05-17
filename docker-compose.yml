@@ -8,7 +8,9 @@ services:
       args:
         - arch=amd64
       dockerfile: ./api/Dockerfile 
-    command: [ "/root/app", "--port", "8000" ]
+    command: [ "/root/app", "--port", "8080" ]
+    ports:
+      - 8080:8080
     networks:
       - public
       - private

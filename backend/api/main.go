@@ -7,6 +7,7 @@ import (
 
 	"zcrapr/api/controller"
 	"zcrapr/core/plog"
+	"zcrapr/core/redis"
 
 	"github.com/google/uuid"
 )
@@ -22,5 +23,11 @@ func main() {
 
 	l := plog.NewPLogger(log.New(os.Stdout, "", 0), uuid.New())
 
-	controller.Serve(*portFlag, l, nil)
+	// TODO: grab these from env vars
+	rc, err := redis.NewPropertyRedisStore(l, "id-counter", "id", "cap", "redis", "", 4, 6379)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	log.Fatalln(controller.Serve(*portFlag, l, rc))
 }

@@ -1,4 +1,4 @@
-package redisclient
+package redis
 
 import (
 	"context"
@@ -158,7 +158,7 @@ func (s *PropertyRedisStore) GetPropertyByID(ctx context.Context, id string) (*m
 }
 
 // GetPropertyByURL x
-func (s *PropertyRedisStore) GetPropertyByURL(ctx context.Context, url string) (*Property, error) {
+func (s *PropertyRedisStore) GetPropertyByURL(ctx context.Context, url string) (*model.Property, error) {
 	id, err := s.client.Get(url).Result()
 	if err != nil {
 		return nil, errors.Wrap(perr.NewErrInternal(err), "could not get id by url")
@@ -202,6 +202,8 @@ func (s *PropertyRedisStore) InsertProperty(ctx context.Context, p *model.Proper
 		return errors.Wrap(perr.NewErrInternal(err), "could not execute transaction")
 	}
 
+	p.ID = base16ID
+
 	// if err := s.client.HSet(base16ID, map[string]interface{}{
 	// 	"id":  base16ID,
 	// 	"url": p.URL,
@@ -217,8 +219,8 @@ func (s *PropertyRedisStore) InsertProperty(ctx context.Context, p *model.Proper
 }
 
 // UpdateProperty x
-func (s *PropertyRedisStore) UpdateProperty(ctx context.Context, p *Property) error {
-	if err := s.client.HSet(base16ID, map[string]interface{}{
+func (s *PropertyRedisStore) UpdateProperty(ctx context.Context, p *model.Property) error {
+	if err := s.client.HSet(p.ID, map[string]interface{}{
 		"url": p.URL,
 	}).Err(); err != nil {
 		return errors.Wrap(perr.NewErrInternal(err), "could not execute redis command")

@@ -1,8 +1,14 @@
 package controller
 
 import (
+	"context"
+	"net/http"
 	"zcrapr/core/model"
+	"zcrapr/core/perr"
 	"zcrapr/core/plog"
+
+	"github.com/go-chi/chi"
+	"github.com/go-chi/render"
 )
 
 // PropertyController controls the flow of HTTP routes for Property resources
@@ -17,4 +23,53 @@ func NewPropertyController(l plog.Logger, ps model.PropertyStore) *PropertyContr
 		l:  l,
 		ps: ps,
 	}
+}
+
+func (c *PropertyController) propertyCtx(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := r.Context()
+		pID := chi.URLParam(r, "property_id")
+		if pID == "" {
+			render.Render(w, r, perr.NewInternalServerHTTPError(ctx, "no property_id in url params", c.l))
+			return
+		}
+
+		p, err := model.GetPropertyByID(r.Context(), pID, c.ps)
+		if err != nil {
+			render.Render(w, r, perr.NewHTTPErrorFromError(ctx, err, "could not find Property by ID", c.l))
+			return
+		}
+
+		ctx = context.WithValue(r.Context(), propertyCtxKey, p)
+		next.ServeHTTP(w, r.WithContext(ctx))
+	})
+}
+
+// HandleCreate handles the creation of a Property
+func (c *PropertyController) HandleCreate(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	var data PropertyRequest
+	if err := render.Bind(r, &data); err != nil {
+		render.Render(w, r, perr.NewValidationHTTPErrorFromError(ctx, err, "could not bind request", c.l))
+		return
+	}
+
+	if err := data.p.Save(ctx, c.ps); err != nil {
+		render.Render(w, r, perr.NewHTTPErrorFromError(ctx, err, "could not persist Property", c.l))
+		return
+	}
+
+	render.Status(r, http.StatusCreated)
+	render.Render(w, r, NewPropertyResponse(data.p))
+}
+
+// HandleGetByID handles the retrieval of a Property by its ID
+func (c *PropertyController) HandleGetByID(w http.ResponseWriter, r *http.Request) {
+	m, ok := r.Context().Value(propertyCtxKey).(*model.Property)
+	if !ok {
+		render.Render(w, r, perr.NewNotFoundHTTPError(r.Context(), "no or invalid Property value for propertyCtxKey", c.l))
+		return
+	}
+
+	render.Render(w, r, NewPropertyResponse(m))
 }

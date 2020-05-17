@@ -59,15 +59,17 @@ func (p *Property) Save(ctx context.Context, ps PropertyStore) error {
 			return errors.Wrap(err, "could not insert Property")
 		}
 
-		return
+		return nil
 	}
 
 	if err := ps.UpdateProperty(ctx, p); err != nil {
 		return errors.Wrap(err, "could not update Property")
 	}
+
+	return nil
 }
 
-// Add adds a new Capture to a Property
+// AddCapture adds a new Capture to a Property
 func (p *Property) AddCapture(ctx context.Context, c *Capture, ps PropertyStore) error {
 	if c.Acreage < 1 {
 		return perr.NewErrInvalid("properties must have at least one acre")
@@ -90,15 +92,18 @@ func (p *Property) AddCapture(ctx context.Context, c *Capture, ps PropertyStore)
 	return nil
 }
 
-// GetCapturesShallow retrieves all the already loaded Captures
-func (p *Property) GetCapturesShallow() []Capture {
+// GetCaptures retrieves all the already loaded Captures
+func (p *Property) GetCaptures() []Capture {
 	return p.captures
 }
 
-// GetCaptures loads all captures into the Property receiever
+// LoadCaptures loads all captures into the Property receiever
 func (p *Property) LoadCaptures(ctx context.Context, ps PropertyStore) error {
 	caps, err := ps.GetAllCapturesByPropertyID(ctx, p.ID)
 	if err != nil {
-		return errors.Wrap(err, "could ")
+		return errors.Wrap(err, "could not get captures")
 	}
+
+	p.captures = caps
+	return nil
 }

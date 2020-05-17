@@ -3,7 +3,6 @@ package controller
 import (
 	"context"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"reflect"
@@ -16,14 +15,15 @@ import (
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/render"
 	"github.com/google/uuid"
+	"github.com/pkg/errors"
 )
 
 // Serve is a blocking function that serves HTTP
-func Serve(port int, l plog.Logger, ps model.PropertyStore) {
-	// pc := NewPropertyController(l, ps)
+func Serve(port int, l plog.Logger, ps model.PropertyStore) error {
+	pc := NewPropertyController(l, ps)
 	mw, err := NewMiddleware(l, uuid.New(), os.Getenv(CorsEnvVarKey))
 	if err != nil {
-		log.Fatalln(err)
+		return errors.Wrap(err, "could not create new middleware")
 	}
 
 	// initialize router
@@ -35,8 +35,10 @@ func Serve(port int, l plog.Logger, ps model.PropertyStore) {
 	r.Use(mw.disableCORS)
 
 	r.Route("/properties", func(r chi.Router) {
-		// r.Get("/", mc.HandleGetAllRoot)
-		// r.Post("/", mc.HandleCreate)
+		r.Post("/", pc.HandleCreate)
+		r.Route("/{property_id}", func(r chi.Router) {
+			r.With(pc.propertyCtx).Get("/", pc.HandleGetByID)
+		})
 	})
 
 	ctx := plog.StoreSpanIDTraceID(context.Background(), "main", "main")
@@ -51,9 +53,12 @@ func Serve(port int, l plog.Logger, ps model.PropertyStore) {
 	}
 
 	if err := chi.Walk(r, walkFn); err != nil {
-		log.Fatalln("could not print API routes: ", err)
+		return errors.Wrap(err, "could not print API routes")
 	}
 
-	log.Fatalln(http.ListenAndServe(fmt.Sprintf(":%v", port), r))
+	if err := http.ListenAndServe(fmt.Sprintf(":%v", port), r); err != nil {
+		return errors.Wrap(err, "could not listen and serve")
+	}
 
+	return nil
 }

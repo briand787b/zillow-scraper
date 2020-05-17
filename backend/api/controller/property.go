@@ -8,25 +8,42 @@ import (
 
 // PropertyRequest is a request object for the Property resource
 type PropertyRequest struct {
+	ID  string `json:"id"`
+	URL string `json:"url"`
+
+	p *model.Property
 }
 
 // Bind does processing on the PropertyRequest after it gets decoded
 func (m *PropertyRequest) Bind(r *http.Request) error {
-	// m.Encoding = obj.Encoding(strings.ToLower(string(m.Encoding)))
+	m.p = &model.Property{
+		ID:  m.ID,
+		URL: m.URL,
+	}
+
 	return nil
 }
 
 // PropertyResponse represents the response object for Property requests
 type PropertyResponse struct {
+	ID  string `json:"id"`
+	URL string `json:"url"`
+
+	p *model.Property
 }
 
 // NewPropertyResponse creates a new PropertyResponse
-func NewPropertyResponse(mm *model.Property) *PropertyResponse {
-	return &PropertyResponse{}
+func NewPropertyResponse(mp *model.Property) *PropertyResponse {
+	return &PropertyResponse{
+		p: mp,
+	}
 }
 
 // Render processes a PropertyResponse before rendering in HTTP response
 func (m *PropertyResponse) Render(w http.ResponseWriter, r *http.Request) error {
+	m.ID = m.p.ID
+	m.URL = m.p.URL
+
 	return nil
 }
 
