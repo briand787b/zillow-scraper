@@ -26,7 +26,9 @@ type PropertyRedisStore struct {
 }
 
 // NewPropertyRedisStore returns a new PropertyStore backed by Redis
-func NewPropertyRedisStore(l plog.Logger, idCounterKey, idPrefix, captureSuffix, host, password string, idWidth, port uint) (*PropertyRedisStore, error) {
+func NewPropertyRedisStore(l plog.Logger, idCounterKey, idPrefix, captureSuffix, host, password string,
+	idWidth, port uint) (*PropertyRedisStore, error) {
+
 	if idCounterKey == "" {
 		return nil, perr.NewErrInvalid("idCounterKey cannot be empty string")
 	}
@@ -135,6 +137,10 @@ func (s *PropertyRedisStore) GetPropertyByID(ctx context.Context, id string) (*m
 		return nil, errors.Wrap(perr.NewErrInternal(err), "could not get all hash keys")
 	}
 
+	if len(fieldMap) < 1 {
+		return nil, perr.NewErrNotFound(errors.Errorf("could not find Property with ID %s", id))
+	}
+
 	id, ok := fieldMap["id"]
 	if !ok || id == "" {
 		return nil, perr.NewErrInternal(errors.New("returned ID is empty"))
@@ -149,6 +155,16 @@ func (s *PropertyRedisStore) GetPropertyByID(ctx context.Context, id string) (*m
 		ID:  id,
 		URL: url,
 	}, nil
+}
+
+// GetPropertyByURL x
+func (s *PropertyRedisStore) GetPropertyByURL(ctx context.Context, url string) (*Property, error) {
+	id, err := s.client.Get(url).Result()
+	if err != nil {
+		return nil, errors.Wrap(perr.NewErrInternal(err), "could not get id by url")
+	}
+
+	return s.GetPropertyByID(ctx, id)
 }
 
 // InsertCaptureByPropertyID x
@@ -174,11 +190,38 @@ func (s *PropertyRedisStore) InsertProperty(ctx context.Context, p *model.Proper
 	}
 
 	base16ID := fmt.Sprintf("%0"+s.idWidth+"x", currMaxID)
-	if err := s.client.HSet(base16ID, map[string]interface{}{
+
+	txPipe := s.client.TxPipeline()
+	defer txPipe.Close()
+	txPipe.HSet(base16ID, map[string]interface{}{
 		"id":  base16ID,
 		"url": p.URL,
+	})
+	txPipe.Set(p.URL, base16ID, 0)
+	if _, err := txPipe.ExecContext(ctx); err != nil {
+		return errors.Wrap(perr.NewErrInternal(err), "could not execute transaction")
+	}
+
+	// if err := s.client.HSet(base16ID, map[string]interface{}{
+	// 	"id":  base16ID,
+	// 	"url": p.URL,
+	// }).Err(); err != nil {
+	// 	return errors.Wrap(perr.NewErrInternal(err), "could not set Property hashmap")
+	// }
+
+	// if err := s.client.Set(p.URL, base16ID, 0).Err(); err != nil {
+	// 	return
+	// }
+
+	return nil
+}
+
+// UpdateProperty x
+func (s *PropertyRedisStore) UpdateProperty(ctx context.Context, p *Property) error {
+	if err := s.client.HSet(base16ID, map[string]interface{}{
+		"url": p.URL,
 	}).Err(); err != nil {
-		return errors.Wrap(perr.NewErrInternal(err), "could not set Property hashmap")
+		return errors.Wrap(perr.NewErrInternal(err), "could not execute redis command")
 	}
 
 	return nil

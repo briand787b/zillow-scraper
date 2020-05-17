@@ -2,6 +2,7 @@ package model
 
 import (
 	"context"
+	"zcrapr/core/perr"
 
 	"github.com/pkg/errors"
 )
@@ -20,8 +21,8 @@ const (
 
 // Capture is a set of values captured at a specific point in time
 type Capture struct {
-	Price   uint   `json:"price"`
-	Acreage uint   `json:"acrege"`
+	Price   int   `json:"price"`
+	Acreage int   `json:"acrege"`
 	Status  Status `json:"status"`
 }
 
@@ -33,14 +34,65 @@ type Property struct {
 	captures []Capture
 }
 
-// Add adds a new Capture to a Property
-func (p *Property) Add(ctx context.Context, ps PropertyStore, c *Capture) error {
-	return errors.New("NOT IMPLEMENTED")
+// GetPropertyByID gets a Property by its ID
+func GetPropertyByID(ctx context.Context, id string, ps PropertyStore) (*Property, error) {
+	if id == "" {
+		return nil, perr.NewErrInvalid("cannot search with an empty ID")
+	}
+
+	p, err := ps.GetPropertyByID(ctx, id)
+	if err != nil {
+		return nil, errors.Wrap(err, "could not get property by ID from store")
+	}
+
+	return p, nil
 }
 
-// // GetCapturesShallow retrieves all the already loaded Captures
-// func (p *Property) GetCapturesShallow() []Capture {
-// 	return p.captures
-// }
+// Save saves a property to the database
+func (p *Property) Save(ctx context.Context, ps PropertyStore) error {
+	if p.URL == "" {
+		return perr.NewErrInvalid("URL cannot be empty")
+	}
 
-// func (p *Property)
+	if p.ID == "" {
+		if err := ps.InsertProperty(ctx, p); err != nil {
+			return errors.Wrap(err, "could not insert Property")
+		}
+
+		return
+	}
+
+	if err := ps.UpdateProperty(ctx, p); err != nil {
+		return errors.Wrap(err, "could not update Property")
+	}
+}
+
+// Add adds a new Capture to a Property
+func (p *Property) AddCapture(ctx context.Context, c *Capture, ps PropertyStore) error {
+	if c.Acreage < 1 {
+		return perr.NewErrInvalid("properties must have at least one acre")
+	}
+
+	if c.Price < 1 {
+		return perr.NewErrInvalid("nothing in life is free")
+	}
+
+	switch c.Status {
+	case ForSale, Pending, Sold:
+	default:
+		return perr.NewErrInvalid("capture has invalid state")
+	}
+
+	if err := ps.InsertCaptureByPropertyID(ctx, p.ID, c); err != nil {
+		return errors.Wrap(err, "could not insert property")
+	}
+
+	return nil
+}
+
+// GetCapturesShallow retrieves all the already loaded Captures
+func (p *Property) GetCapturesShallow() []Capture {
+	return p.captures
+}
+
+func (p *Property)
