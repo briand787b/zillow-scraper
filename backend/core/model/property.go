@@ -21,8 +21,8 @@ const (
 
 // Capture is a set of values captured at a specific point in time
 type Capture struct {
-	Price   int   `json:"price"`
-	Acreage int   `json:"acrege"`
+	Price   int    `json:"price"`
+	Acreage int    `json:"acrege"`
 	Status  Status `json:"status"`
 }
 
@@ -95,4 +95,10 @@ func (p *Property) GetCapturesShallow() []Capture {
 	return p.captures
 }
 
-func (p *Property)
+// GetCaptures loads all captures into the Property receiever
+func (p *Property) LoadCaptures(ctx context.Context, ps PropertyStore) error {
+	caps, err := ps.GetAllCapturesByPropertyID(ctx, p.ID)
+	if err != nil {
+		return errors.Wrap(err, "could ")
+	}
+}
