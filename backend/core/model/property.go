@@ -20,18 +20,27 @@ const (
 
 // Capture is a set of values captured at a specific point in time
 type Capture struct {
-	Price   uint
-	Acreage uint
-	Status  Status
+	Price   uint   `json:"price"`
+	Acreage uint   `json:"acrege"`
+	Status  Status `json:"status"`
 }
 
 // Property represents a Property
 type Property struct {
-	URL      string
-	Captures []Capture
+	ID  string
+	URL string
+
+	captures []Capture
 }
 
 // Add adds a new Capture to a Property
-func (p *Property) Add(ctx context.Context, as PropertyStore, c *Capture) error {
+func (p *Property) Add(ctx context.Context, ps PropertyStore, c *Capture) error {
 	return errors.New("NOT IMPLEMENTED")
 }
+
+// // GetCapturesShallow retrieves all the already loaded Captures
+// func (p *Property) GetCapturesShallow() []Capture {
+// 	return p.captures
+// }
+
+// func (p *Property)
