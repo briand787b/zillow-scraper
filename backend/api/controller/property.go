@@ -11,8 +11,10 @@ import (
 
 // PropertyRequest is a request object for the Property resource
 type PropertyRequest struct {
-	ID  string `json:"id"`
-	URL string `json:"url"`
+	ID      string `json:"id"`
+	URL     string `json:"url"`
+	Acreage int    `json:"acreage"`
+	Address string `json:"address"`
 
 	p *model.Property
 }
@@ -20,8 +22,10 @@ type PropertyRequest struct {
 // Bind does processing on the PropertyRequest after it gets decoded
 func (m *PropertyRequest) Bind(r *http.Request) error {
 	m.p = &model.Property{
-		ID:  m.ID,
-		URL: m.URL,
+		ID:      m.ID,
+		URL:     m.URL,
+		Acreage: m.Acreage,
+		Address: m.Address,
 	}
 
 	return nil
@@ -29,8 +33,10 @@ func (m *PropertyRequest) Bind(r *http.Request) error {
 
 // PropertyResponse represents the response object for Property requests
 type PropertyResponse struct {
-	ID  string `json:"id"`
-	URL string `json:"url"`
+	ID      string `json:"id"`
+	URL     string `json:"url"`
+	Acreage int    `json:"acreage"`
+	Address string `json:"address"`
 
 	p *model.Property
 }
@@ -46,6 +52,8 @@ func NewPropertyResponse(mp *model.Property) *PropertyResponse {
 func (m *PropertyResponse) Render(w http.ResponseWriter, r *http.Request) error {
 	m.ID = m.p.ID
 	m.URL = m.p.URL
+	m.Acreage = m.p.Acreage
+	m.Address = m.p.Address
 
 	return nil
 }

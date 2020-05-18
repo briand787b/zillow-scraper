@@ -32,6 +32,25 @@ const (
 	ErrInternal = Error("internal server error")
 )
 
+// IsInternalServerError returns boolean indicating whether error is caused by the
+// system itself.  True means that the error is either known to have been caused
+// by a fault in the system or is of unknown type
+func IsInternalServerError(ctx context.Context, l plog.Logger, e error) bool {
+	if e == nil {
+		l.Error(ctx, "nil error passed to 'GetExternalMsg'")
+		return false
+	}
+
+	switch c := errors.Cause(e); {
+	case c == ErrInvalid,
+		c == ErrNotFound,
+		c == ErrUnauthorized:
+		return false
+	}
+
+	return true
+}
+
 // GetExternalMsg extracts the message for the error that is suitable
 // for displaying externally
 func GetExternalMsg(ctx context.Context, l plog.Logger, e error) string {

@@ -10,6 +10,7 @@ import (
 	"zcrapr/core/perr"
 	"zcrapr/core/plog"
 
+	"github.com/go-redis/redis/v7"
 	goredis "github.com/go-redis/redis/v7"
 	"github.com/pkg/errors"
 )
@@ -170,14 +171,19 @@ func (s *PropertyRedisStore) GetPropertyByID(ctx context.Context, id string) (*m
 	}, nil
 }
 
-// GetPropertyByURL x
-func (s *PropertyRedisStore) GetPropertyByURL(ctx context.Context, url string) (*model.Property, error) {
+// GetPropertyIDByURL x
+func (s *PropertyRedisStore) GetPropertyIDByURL(ctx context.Context, url string) (string, error) {
 	id, err := s.client.Get(url).Result()
 	if err != nil {
-		return nil, errors.Wrap(perr.NewErrInternal(err), "could not get id by url")
+		if err == redis.Nil {
+			return "", perr.NewErrNotFound(errors.New("url does not exist in database"))
+		}
+
+		s.l.Error(ctx, "error retrieving Property ID from URL", "error", err)
+		return "", errors.Wrap(perr.NewErrInternal(err), "could not get id by url")
 	}
 
-	return s.GetPropertyByID(ctx, id)
+	return id, nil
 }
 
 // InsertCaptureByPropertyID x
