@@ -90,21 +90,22 @@ func (s *PropertyRedisStore) GetAllPropertyIDs(ctx context.Context, skip, take i
 	var allKeys []string
 	var nextKeys []string
 	var err error
-	takeIncr := int64(100)
-	cursor := uint64(skip)
-	remaining := int64(take)
-	for remaining > 0 {
-		if takeIncr > remaining {
-			takeIncr = remaining
-		}
-
-		nextKeys, cursor, err = s.client.Scan(cursor, s.idPrefix+":*", takeIncr).Result()
+	var cursor uint64
+	count := int64(take)
+	for {
+		nextKeys, cursor, err = s.client.Scan(cursor, s.idPrefix+":*", count).Result()
 		if err != nil {
 			return nil, perr.NewErrInternal(errors.Wrap(err, "could not execute Redis command"))
 		}
 
 		allKeys = append(allKeys, nextKeys...)
-		remaining -= takeIncr
+		if cursor == 0 {
+			break
+		}
+
+		if len(allKeys) >= take {
+			break
+		}
 	}
 
 	return allKeys, nil
@@ -140,6 +141,8 @@ func (s *PropertyRedisStore) GetPropertyByID(ctx context.Context, id string) (*m
 	if len(fieldMap) < 1 {
 		return nil, perr.NewErrNotFound(errors.Errorf("could not find Property with ID %s", id))
 	}
+
+	s.l.Info(ctx, "returned redis hash map", "hashmap", fieldMap)
 
 	id, ok := fieldMap["id"]
 	if !ok || id == "" {
@@ -189,7 +192,7 @@ func (s *PropertyRedisStore) InsertProperty(ctx context.Context, p *model.Proper
 		return errors.Wrap(perr.NewErrInternal(err), "could not increment ID counter")
 	}
 
-	base16ID := fmt.Sprintf("%0"+s.idWidth+"x", currMaxID)
+	base16ID := fmt.Sprintf("%s:%0"+s.idWidth+"x", s.idPrefix, currMaxID)
 
 	txPipe := s.client.TxPipeline()
 	defer txPipe.Close()

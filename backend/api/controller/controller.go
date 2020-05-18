@@ -36,6 +36,7 @@ func Serve(port int, l plog.Logger, ps model.PropertyStore) error {
 
 	r.Route("/properties", func(r chi.Router) {
 		r.Post("/", pc.HandleCreate)
+		r.With(mw.skipTake).Get("/", pc.HandleGetAll)
 		r.Route("/{property_id}", func(r chi.Router) {
 			r.With(pc.propertyCtx).Get("/", pc.HandleGetByID)
 		})

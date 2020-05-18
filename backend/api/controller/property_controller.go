@@ -3,6 +3,7 @@ package controller
 import (
 	"context"
 	"net/http"
+
 	"zcrapr/core/model"
 	"zcrapr/core/perr"
 	"zcrapr/core/plog"
@@ -72,4 +73,19 @@ func (c *PropertyController) HandleGetByID(w http.ResponseWriter, r *http.Reques
 	}
 
 	render.Render(w, r, NewPropertyResponse(m))
+}
+
+// HandleGetAll handles requests to get all the properties
+func (c *PropertyController) HandleGetAll(w http.ResponseWriter, r *http.Request) {
+	skip := r.Context().Value(skipCtxKey).(int)
+	take := r.Context().Value(takeCtxKey).(int)
+
+	ctx := r.Context()
+	ps, err := model.GetAllProperties(ctx, skip, take, c.ps)
+	if err != nil {
+		render.Render(w, r, perr.NewHTTPErrorFromError(ctx, err, "could not get all root Media", c.l))
+		return
+	}
+
+	render.Render(w, r, NewPropertyResponseList(ps, 0, 0))
 }

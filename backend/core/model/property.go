@@ -2,10 +2,13 @@ package model
 
 import (
 	"context"
+	"fmt"
 	"zcrapr/core/perr"
 
 	"github.com/pkg/errors"
 )
+
+const maxPropertyTake = 100
 
 // Status enumerates the statuses a property can be in
 type Status int
@@ -46,6 +49,38 @@ func GetPropertyByID(ctx context.Context, id string, ps PropertyStore) (*Propert
 	}
 
 	return p, nil
+}
+
+// GetAllProperties retrieves all Properties
+func GetAllProperties(ctx context.Context, skip, take int, ps PropertyStore) ([]Property, error) {
+	if skip < 0 {
+		return nil, perr.NewErrInvalid("skip cannot be negative")
+	}
+
+	if take < 1 {
+		return nil, perr.NewErrInvalid("take must be at least 1")
+	}
+
+	if take > maxPropertyTake {
+		return nil, perr.NewErrInvalid(fmt.Sprintf("cannot take more than max (%v)", maxPropertyTake))
+	}
+
+	propIDs, err := ps.GetAllPropertyIDs(ctx, skip, take)
+	if err != nil {
+		return nil, errors.Wrap(err, "could not get all properties")
+	}
+
+	props := make([]Property, len(propIDs))
+	for i, propID := range propIDs {
+		prop, err := ps.GetPropertyByID(ctx, propID)
+		if err != nil {
+			return nil, errors.Wrap(err, "could not get property by ID")
+		}
+
+		props[i] = *prop
+	}
+
+	return props, nil
 }
 
 // Save saves a property to the database

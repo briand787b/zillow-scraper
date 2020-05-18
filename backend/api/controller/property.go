@@ -4,6 +4,9 @@ import (
 	"net/http"
 
 	"zcrapr/core/model"
+	"zcrapr/core/perr"
+
+	"github.com/pkg/errors"
 )
 
 // PropertyRequest is a request object for the Property resource
@@ -54,24 +57,27 @@ type PropertyResponseList struct {
 	Take       int                `json:"take"`
 	NextSkip   int                `json:"next_skip,omitempty"`
 
-	ms []model.Property
+	ps []model.Property
 }
 
 // NewPropertyResponseList converts a slice of model.Property into a PropertyResponseList
-func NewPropertyResponseList(mms []model.Property, skip, take int) *PropertyResponseList {
+func NewPropertyResponseList(mps []model.Property, skip, take int) *PropertyResponseList {
 	return &PropertyResponseList{
 		Skip: skip,
 		Take: take,
 
-		ms: mms,
+		ps: mps,
 	}
 }
 
 // Render does any processing ahead of the go-chi library's rendering
 func (l *PropertyResponseList) Render(w http.ResponseWriter, r *http.Request) error {
-	l.Properties = make([]PropertyResponse, len(l.ms))
-	for i := 0; i < len(l.ms); i++ {
-		l.Properties[i] = *NewPropertyResponse(&l.ms[i])
+	l.Properties = make([]PropertyResponse, len(l.ps))
+	for i := 0; i < len(l.ps); i++ {
+		l.Properties[i] = *NewPropertyResponse(&l.ps[i])
+		if err := l.Properties[i].Render(nil, nil); err != nil {
+			return perr.NewErrInternal(errors.Wrap(err, "could not bind PropertyResponse"))
+		}
 	}
 
 	if len(l.Properties) >= l.Take {
