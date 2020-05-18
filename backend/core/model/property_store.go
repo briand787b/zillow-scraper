@@ -8,7 +8,7 @@ type PropertyStore interface {
 	GetAllPropertyIDs(ctx context.Context, skip, take int) ([]string, error)
 	GetLatestCaptureByPropertyID(ctx context.Context, propID string) (*Capture, error)
 	GetPropertyByID(ctx context.Context, id string) (*Property, error)
-	GetPropertyByURL(ctx context.Context, url string) (*Property, error)
+	GetPropertyIDByURL(ctx context.Context, url string) (string, error)
 	InsertCaptureByPropertyID(ctx context.Context, propID string, c *Capture) error
 	InsertProperty(ctx context.Context, p *Property) error
 	UpdateProperty(ctx context.Context, p *Property) error

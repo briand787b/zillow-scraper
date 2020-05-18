@@ -10,6 +10,7 @@ import (
 	"zcrapr/core/perr"
 	"zcrapr/core/plog"
 
+	"github.com/go-redis/redis/v7"
 	goredis "github.com/go-redis/redis/v7"
 	"github.com/pkg/errors"
 )
@@ -160,14 +161,19 @@ func (s *PropertyRedisStore) GetPropertyByID(ctx context.Context, id string) (*m
 	}, nil
 }
 
-// GetPropertyByURL x
-func (s *PropertyRedisStore) GetPropertyByURL(ctx context.Context, url string) (*model.Property, error) {
+// GetPropertyIDByURL x
+func (s *PropertyRedisStore) GetPropertyIDByURL(ctx context.Context, url string) (string, error) {
 	id, err := s.client.Get(url).Result()
 	if err != nil {
-		return nil, errors.Wrap(perr.NewErrInternal(err), "could not get id by url")
+		if err == redis.Nil {
+			return "", perr.NewErrNotFound(errors.New("url does not exist in database"))
+		}
+
+		s.l.Error(ctx, "error retrieving Property ID from URL", "error", err)
+		return "", errors.Wrap(perr.NewErrInternal(err), "could not get id by url")
 	}
 
-	return s.GetPropertyByID(ctx, id)
+	return id, nil
 }
 
 // InsertCaptureByPropertyID x
@@ -206,17 +212,6 @@ func (s *PropertyRedisStore) InsertProperty(ctx context.Context, p *model.Proper
 	}
 
 	p.ID = base16ID
-
-	// if err := s.client.HSet(base16ID, map[string]interface{}{
-	// 	"id":  base16ID,
-	// 	"url": p.URL,
-	// }).Err(); err != nil {
-	// 	return errors.Wrap(perr.NewErrInternal(err), "could not set Property hashmap")
-	// }
-
-	// if err := s.client.Set(p.URL, base16ID, 0).Err(); err != nil {
-	// 	return
-	// }
 
 	return nil
 }

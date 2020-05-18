@@ -35,7 +35,7 @@ func (c *PropertyController) propertyCtx(next http.Handler) http.Handler {
 			return
 		}
 
-		p, err := model.GetPropertyByID(r.Context(), pID, c.ps)
+		p, err := model.GetPropertyByID(r.Context(), c.l, pID, c.ps)
 		if err != nil {
 			render.Render(w, r, perr.NewHTTPErrorFromError(ctx, err, "could not find Property by ID", c.l))
 			return
@@ -55,7 +55,7 @@ func (c *PropertyController) HandleCreate(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	if err := data.p.Save(ctx, c.ps); err != nil {
+	if err := data.p.Save(ctx, c.l, c.ps); err != nil {
 		render.Render(w, r, perr.NewHTTPErrorFromError(ctx, err, "could not persist Property", c.l))
 		return
 	}
@@ -81,7 +81,7 @@ func (c *PropertyController) HandleGetAll(w http.ResponseWriter, r *http.Request
 	take := r.Context().Value(takeCtxKey).(int)
 
 	ctx := r.Context()
-	ps, err := model.GetAllProperties(ctx, skip, take, c.ps)
+	ps, err := model.GetAllProperties(ctx, c.l, skip, take, c.ps)
 	if err != nil {
 		render.Render(w, r, perr.NewHTTPErrorFromError(ctx, err, "could not get all root Media", c.l))
 		return
