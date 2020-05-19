@@ -32,6 +32,17 @@ const (
 	ErrInternal = Error("internal server error")
 )
 
+// SameType determines whether the given error is the same type as thee
+// known Error provided
+func SameType(e error, known Error) bool {
+	err, ok := errors.Cause(e).(Error)
+	if !ok {
+		return false
+	}
+
+	return err == known
+}
+
 // IsInternalServerError returns boolean indicating whether error is caused by the
 // system itself.  True means that the error is either known to have been caused
 // by a fault in the system or is of unknown type

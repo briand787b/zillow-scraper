@@ -132,16 +132,6 @@ func (s *PropertyRedisStore) GetLatestCaptureByPropertyID(ctx context.Context, p
 	return &cap, nil
 }
 
-// GetPropertyByAddress x
-func (s *PropertyRedisStore) GetPropertyByAddress(ctx context.Context, address string) (*model.Property, error) {
-	id, err := s.client.Get(address).Result()
-	if err != nil {
-		return nil, errors.Wrap(perr.NewErrInternal(err), "could not get id by address")
-	}
-
-	return s.GetPropertyByID(ctx, id)
-}
-
 // GetPropertyByID x
 func (s *PropertyRedisStore) GetPropertyByID(ctx context.Context, id string) (*model.Property, error) {
 	fieldMap, err := s.client.HGetAll(id).Result()
@@ -161,14 +151,45 @@ func (s *PropertyRedisStore) GetPropertyByID(ctx context.Context, id string) (*m
 	}
 
 	url, ok := fieldMap["url"]
-	if !ok || id == "" {
+	if !ok || url == "" {
 		return nil, perr.NewErrInternal(errors.New("returned url is empty"))
 	}
 
+	acreageStr, ok := fieldMap["acreage"]
+	if !ok || acreageStr == "" {
+		return nil, perr.NewErrInternal(errors.New("returned acreage is empty"))
+	}
+
+	acreage, err := strconv.Atoi(acreageStr)
+	if err != nil {
+		return nil, errors.Wrap(perr.NewErrInternal(err), "could not convert acreage to int")
+	}
+
+	address, ok := fieldMap["address"]
+	if !ok || address == "" {
+		return nil, perr.NewErrInternal(errors.New("returned address is empty"))
+	}
+
 	return &model.Property{
-		ID:  id,
-		URL: url,
+		ID:      id,
+		URL:     url,
+		Acreage: acreage,
+		Address: address,
 	}, nil
+}
+
+// GetPropertyIDByAddress x
+func (s *PropertyRedisStore) GetPropertyIDByAddress(ctx context.Context, url string) (string, error) {
+	id, err := s.client.Get(url).Result()
+	if err != nil {
+		if err == redis.Nil {
+			return "", perr.NewErrNotFound(errors.New("address does not exist in database"))
+		}
+
+		return "", errors.Wrap(perr.NewErrInternal(err), "could not get id by address")
+	}
+
+	return id, nil
 }
 
 // GetPropertyIDByURL x
@@ -179,7 +200,6 @@ func (s *PropertyRedisStore) GetPropertyIDByURL(ctx context.Context, url string)
 			return "", perr.NewErrNotFound(errors.New("url does not exist in database"))
 		}
 
-		s.l.Error(ctx, "error retrieving Property ID from URL", "error", err)
 		return "", errors.Wrap(perr.NewErrInternal(err), "could not get id by url")
 	}
 
@@ -213,8 +233,10 @@ func (s *PropertyRedisStore) InsertProperty(ctx context.Context, p *model.Proper
 	txPipe := s.client.TxPipeline()
 	defer txPipe.Close()
 	txPipe.HSet(base16ID, map[string]interface{}{
-		"id":  base16ID,
-		"url": p.URL,
+		"id":      base16ID,
+		"url":     p.URL,
+		"acreage": p.Acreage,
+		"address": p.Address,
 	})
 	txPipe.Set(p.URL, base16ID, 0)
 	txPipe.Set(p.Address, base16ID, 0)

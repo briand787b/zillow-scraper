@@ -145,10 +145,17 @@ func (p *Property) LoadCaptures(ctx context.Context, l plog.Logger, ps PropertyS
 
 func (p *Property) insert(ctx context.Context, l plog.Logger, ps PropertyStore) error {
 	_, err := ps.GetPropertyIDByURL(ctx, p.URL)
-	if err != nil && perr.IsInternalServerError(ctx, l, err) {
+	if err != nil && !perr.SameType(err, perr.ErrNotFound) {
 		return errors.Wrap(err, "could not get property ID from URL")
 	} else if err == nil {
 		return perr.NewErrInvalid(fmt.Sprintf("URL %s already exists in the database", p.URL))
+	}
+
+	_, err = ps.GetPropertyIDByAddress(ctx, p.Address)
+	if err != nil && !perr.SameType(err, perr.ErrNotFound) {
+		return errors.Wrap(err, "could not get property ID from address")
+	} else if err == nil {
+		return perr.NewErrInvalid(fmt.Sprintf("address %s already exists in the database", p.Address))
 	}
 
 	if err := ps.InsertProperty(ctx, p); err != nil {
