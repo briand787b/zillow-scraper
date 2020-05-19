@@ -11,24 +11,6 @@ import (
 
 const maxPropertyTake = 100
 
-// Status enumerates the statuses a property can be in
-type Status int
-
-const (
-	// ForSale is any property that is for sale
-	ForSale Status = iota
-	// Pending is a property under contract
-	Pending
-	// Sold is a property that is off the market
-	Sold
-)
-
-// Capture is a set of values captured at a specific point in time
-type Capture struct {
-	Price  int    `json:"price"`
-	Status Status `json:"status"`
-}
-
 // Property represents a Property
 type Property struct {
 	ID      string
@@ -85,6 +67,38 @@ func GetAllProperties(ctx context.Context, l plog.Logger, skip, take int, ps Pro
 	return props, nil
 }
 
+// LoadPropertyByFields loads a Property from the database using the fields of given Property.  This function is useful
+// for loading Property records into memory when the caller is unsure if the Property reference it holds accurately
+// represents a database record, or if it even exists.  It goes through the fields of the Property (in order of
+// specificity) and searches on the first field that is non-empty.  If that field does not return a valid Property,
+// this function returns an error
+func LoadPropertyByFields(ctx context.Context, l plog.Logger, p *Property, ps PropertyStore) (*Property, error) {
+	id := p.ID
+	var err error
+	if id == "" {
+		if p.Address != "" {
+			if id, err = ps.GetPropertyIDByAddress(ctx, p.Address); err != nil {
+				return nil, errors.Wrap(err, "could not get Property ID by address")
+			}
+		} else if p.URL != "" {
+			if id, err = ps.GetPropertyIDByURL(ctx, p.URL); err != nil {
+				return nil, errors.Wrap(err, "could not get Property ID by URL")
+			}
+		} else {
+			// there are no fields provided that can be used to load
+			// a Property and this function will return an error
+			return nil, perr.NewErrInvalid("provided Property has no uniquely identifiable fields on it")
+		}
+	}
+
+	loaded, err := ps.GetPropertyByID(ctx, id)
+	if err != nil {
+		return nil, errors.Wrap(err, "could not load Property by ID")
+	}
+
+	return loaded, nil
+}
+
 // Save saves a property to the database
 func (p *Property) Save(ctx context.Context, l plog.Logger, ps PropertyStore) error {
 	if p.URL == "" {
@@ -106,35 +120,16 @@ func (p *Property) Save(ctx context.Context, l plog.Logger, ps PropertyStore) er
 	return p.update(ctx, ps)
 }
 
-// AddCapture adds a new Capture to a Property
-func (p *Property) AddCapture(ctx context.Context, l plog.Logger, c *Capture, ps PropertyStore) error {
-	if c.Price < 1 {
-		return perr.NewErrInvalid("nothing in life is free")
-	}
-
-	switch c.Status {
-	case ForSale, Pending, Sold:
-	default:
-		return perr.NewErrInvalid("capture has invalid state")
-	}
-
-	if err := ps.InsertCaptureByPropertyID(ctx, p.ID, c); err != nil {
-		return errors.Wrap(err, "could not insert property")
-	}
-
-	return nil
-}
-
 // GetCaptures retrieves all the already loaded Captures
 func (p *Property) GetCaptures() []Capture {
 	return p.captures
 }
 
 // LoadCaptures loads all captures into the Property receiever
-func (p *Property) LoadCaptures(ctx context.Context, l plog.Logger, ps PropertyStore) error {
-	caps, err := ps.GetAllCapturesByPropertyID(ctx, p.ID)
+func (p *Property) LoadCaptures(ctx context.Context, l plog.Logger, cs CaptureStore) error {
+	caps, err := cs.GetAllCapturesByPropertyID(ctx, p.ID)
 	if err != nil {
-		return errors.Wrap(err, "could not get captures")
+		return errors.Wrap(err, "could not get Captures")
 	}
 
 	p.captures = caps

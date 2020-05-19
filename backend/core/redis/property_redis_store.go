@@ -2,7 +2,6 @@ package redis
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"strconv"
 
@@ -68,24 +67,6 @@ func NewPropertyRedisStore(l plog.Logger, idCounterKey, idPrefix, captureSuffix,
 	}, nil
 }
 
-// GetAllCapturesByPropertyID x
-func (s *PropertyRedisStore) GetAllCapturesByPropertyID(ctx context.Context, propID string) ([]model.Capture, error) {
-	captureKey := propID + s.captureSuffix
-	caps, err := s.client.LRange(captureKey, 0, -1).Result()
-	if err != nil {
-		return nil, errors.Wrap(perr.NewErrInternal(err), "could not range over captures")
-	}
-
-	modelCaps := make([]model.Capture, len(caps))
-	for i := 0; i < len(caps); i++ {
-		if err := json.Unmarshal([]byte(caps[i]), &modelCaps[i]); err != nil {
-			return nil, errors.Wrap(perr.NewErrInternal(err), "could not unmarshal Capture to JSON")
-		}
-	}
-
-	return modelCaps, nil
-}
-
 // GetAllPropertyIDs x
 func (s *PropertyRedisStore) GetAllPropertyIDs(ctx context.Context, skip, take int) ([]string, error) {
 	var allKeys []string
@@ -110,26 +91,6 @@ func (s *PropertyRedisStore) GetAllPropertyIDs(ctx context.Context, skip, take i
 	}
 
 	return allKeys, nil
-}
-
-// GetLatestCaptureByPropertyID x
-func (s *PropertyRedisStore) GetLatestCaptureByPropertyID(ctx context.Context, propID string) (*model.Capture, error) {
-	captureKey := propID + s.captureSuffix
-	caps, err := s.client.LRange(captureKey, 0, 0).Result()
-	if err != nil {
-		return nil, errors.Wrap(perr.NewErrInternal(err), "could not execute Redis command")
-	}
-
-	if len(caps) < 1 {
-		return nil, perr.NewErrNotFound(errors.New("no captures found"))
-	}
-
-	var cap model.Capture
-	if err := json.Unmarshal([]byte(caps[0]), &cap); err != nil {
-		return nil, errors.Wrap(perr.NewErrInternal(err), "could not unmarshal to Redis output to Capture")
-	}
-
-	return &cap, nil
 }
 
 // GetPropertyByID x
@@ -204,21 +165,6 @@ func (s *PropertyRedisStore) GetPropertyIDByURL(ctx context.Context, url string)
 	}
 
 	return id, nil
-}
-
-// InsertCaptureByPropertyID x
-func (s *PropertyRedisStore) InsertCaptureByPropertyID(ctx context.Context, propID string, c *model.Capture) error {
-	captureKey := propID + s.captureSuffix
-	bs, err := json.Marshal(c)
-	if err != nil {
-		return errors.Wrap(perr.NewErrInternal(err), "could not marshal Capture to JSON")
-	}
-
-	if err := s.client.LPush(captureKey, bs).Err(); err != nil {
-		return errors.Wrap(perr.NewErrInternal(err), "could not execute Redis command")
-	}
-
-	return nil
 }
 
 // InsertProperty x
