@@ -18,13 +18,13 @@ type CaptureRedisStore struct {
 	l      plog.Logger
 	client *goredis.Client
 
-	captureSuffix string
+	capturePrefix string
 }
 
 // NewCaptureRedisStore returns a new CaptureStore backed by Redis
-func NewCaptureRedisStore(l plog.Logger, captureSuffix, host, password string, port uint) (*CaptureRedisStore, error) {
-	if captureSuffix == "" {
-		return nil, perr.NewErrInvalid("captureSuffix cannot be empty string")
+func NewCaptureRedisStore(l plog.Logger, capturePrefix, host, password string, port uint) (*CaptureRedisStore, error) {
+	if capturePrefix == "" {
+		return nil, perr.NewErrInvalid("capturePrefix cannot be empty string")
 	}
 
 	client := goredis.NewClient(&goredis.Options{
@@ -42,14 +42,13 @@ func NewCaptureRedisStore(l plog.Logger, captureSuffix, host, password string, p
 	return &CaptureRedisStore{
 		l:             l,
 		client:        client,
-		captureSuffix: captureSuffix,
+		capturePrefix: capturePrefix,
 	}, nil
 }
 
 // GetAllCapturesByPropertyID x
 func (s *CaptureRedisStore) GetAllCapturesByPropertyID(ctx context.Context, propID string) ([]model.Capture, error) {
-	captureKey := propID + s.captureSuffix
-	caps, err := s.client.LRange(captureKey, 0, -1).Result()
+	caps, err := s.client.LRange(s.getCaptureKey(propID), 0, -1).Result()
 	if err != nil {
 		return nil, errors.Wrap(perr.NewErrInternal(err), "could not range over captures")
 	}
@@ -65,9 +64,8 @@ func (s *CaptureRedisStore) GetAllCapturesByPropertyID(ctx context.Context, prop
 }
 
 // GetLatestCaptureByPropertyID x
-func (s *PropertyRedisStore) GetLatestCaptureByPropertyID(ctx context.Context, propID string) (*model.Capture, error) {
-	captureKey := propID + s.captureSuffix
-	caps, err := s.client.LRange(captureKey, 0, 0).Result()
+func (s *CaptureRedisStore) GetLatestCaptureByPropertyID(ctx context.Context, propID string) (*model.Capture, error) {
+	caps, err := s.client.LRange(s.getCaptureKey(propID), 0, 0).Result()
 	if err != nil {
 		return nil, errors.Wrap(perr.NewErrInternal(err), "could not execute Redis command")
 	}
@@ -85,16 +83,19 @@ func (s *PropertyRedisStore) GetLatestCaptureByPropertyID(ctx context.Context, p
 }
 
 // InsertCaptureByPropertyID x
-func (s *PropertyRedisStore) InsertCaptureByPropertyID(ctx context.Context, propID string, c *model.Capture) error {
-	captureKey := propID + s.captureSuffix
+func (s *CaptureRedisStore) InsertCaptureByPropertyID(ctx context.Context, propID string, c *model.Capture) error {
 	bs, err := json.Marshal(c)
 	if err != nil {
 		return errors.Wrap(perr.NewErrInternal(err), "could not marshal Capture to JSON")
 	}
 
-	if err := s.client.LPush(captureKey, bs).Err(); err != nil {
+	if err := s.client.LPush(s.getCaptureKey(propID), bs).Err(); err != nil {
 		return errors.Wrap(perr.NewErrInternal(err), "could not execute Redis command")
 	}
 
 	return nil
+}
+
+func (s *CaptureRedisStore) getCaptureKey(propID string) string {
+	return s.capturePrefix + ":" + propID
 }

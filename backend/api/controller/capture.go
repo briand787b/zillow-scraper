@@ -11,12 +11,12 @@ import (
 
 // CaptureRequest is a request object for the Capture resource
 type CaptureRequest struct {
-	Price   int    `json:"price"`
-	Status  string `json:"status"`
-	URL     string `json:"url"`
-	Address string `json:"address"`
+	Property PropertyRequest `json:"property"`
+	Price    int             `json:"price"`
+	Status   string          `json:"status"`
 
 	c *model.Capture
+	p *model.Property
 }
 
 // Bind does processing on the CaptureRequest after it gets decoded
@@ -30,6 +30,12 @@ func (c *CaptureRequest) Bind(r *http.Request) error {
 		Price:  c.Price,
 		Status: status,
 	}
+
+	if err := c.Property.Bind(r); err != nil {
+		return errors.Wrap(err, "could not bind Property")
+	}
+
+	c.p = c.Property.p
 
 	return nil
 }

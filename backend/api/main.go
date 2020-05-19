@@ -24,10 +24,16 @@ func main() {
 	l := plog.NewPLogger(log.New(os.Stdout, "", 0), uuid.New())
 
 	// TODO: grab these from env vars
-	rc, err := redis.NewPropertyRedisStore(l, "id-counter", "id", "cap", "redis", "", 4, 6379)
+	cs, err := redis.NewCaptureRedisStore(l, "cap", "redis", "", 6379)
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	log.Fatalln(controller.Serve(*portFlag, l, rc))
+	// TODO: grab these from env vars
+	ps, err := redis.NewPropertyRedisStore(l, "id-counter", "id", "redis", "", 4, 6379)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	log.Fatalln(controller.Serve(*portFlag, l, cs, ps))
 }

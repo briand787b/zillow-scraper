@@ -19,7 +19,8 @@ import (
 )
 
 // Serve is a blocking function that serves HTTP
-func Serve(port int, l plog.Logger, ps model.PropertyStore) error {
+func Serve(port int, l plog.Logger, cs model.CaptureStore, ps model.PropertyStore) error {
+	cc := NewCaptureController(l, cs, ps)
 	pc := NewPropertyController(l, ps)
 	mw, err := NewMiddleware(l, uuid.New(), os.Getenv(CorsEnvVarKey))
 	if err != nil {
@@ -40,6 +41,10 @@ func Serve(port int, l plog.Logger, ps model.PropertyStore) error {
 		r.Route("/{property_id}", func(r chi.Router) {
 			r.With(pc.propertyCtx).Get("/", pc.HandleGetByID)
 		})
+	})
+
+	r.Route("/captures", func(r chi.Router) {
+		r.Post("/", cc.HandleCreate)
 	})
 
 	ctx := plog.StoreSpanIDTraceID(context.Background(), "main", "main")

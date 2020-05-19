@@ -19,14 +19,13 @@ type PropertyRedisStore struct {
 	l      plog.Logger
 	client *goredis.Client
 
-	idCounterKey  string
-	idPrefix      string
-	captureSuffix string
-	idWidth       string
+	idCounterKey string
+	idPrefix     string
+	idWidth      string
 }
 
 // NewPropertyRedisStore returns a new PropertyStore backed by Redis
-func NewPropertyRedisStore(l plog.Logger, idCounterKey, idPrefix, captureSuffix, host, password string,
+func NewPropertyRedisStore(l plog.Logger, idCounterKey, idPrefix, host, password string,
 	idWidth, port uint) (*PropertyRedisStore, error) {
 
 	if idCounterKey == "" {
@@ -35,10 +34,6 @@ func NewPropertyRedisStore(l plog.Logger, idCounterKey, idPrefix, captureSuffix,
 
 	if idPrefix == "" {
 		return nil, perr.NewErrInvalid("idPrefix cannot be empty string")
-	}
-
-	if captureSuffix == "" {
-		return nil, perr.NewErrInvalid("captureSuffix cannot be empty string")
 	}
 
 	if idWidth == 0 {
@@ -58,12 +53,11 @@ func NewPropertyRedisStore(l plog.Logger, idCounterKey, idPrefix, captureSuffix,
 	}
 
 	return &PropertyRedisStore{
-		l:             l,
-		client:        client,
-		idCounterKey:  idCounterKey,
-		idPrefix:      idPrefix,
-		captureSuffix: captureSuffix,
-		idWidth:       strconv.Itoa(int(idWidth)),
+		l:            l,
+		client:       client,
+		idCounterKey: idCounterKey,
+		idPrefix:     idPrefix,
+		idWidth:      strconv.Itoa(int(idWidth)),
 	}, nil
 }
 
