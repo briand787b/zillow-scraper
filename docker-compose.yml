@@ -1,6 +1,20 @@
 version: "3.7"
 
 services:
+  frontend:
+    image: zscraper-frontend
+    build: ./frontend
+    # react app exits w/ code 0 w/o this
+    stdin_open: true 
+    volumes:
+      - type: bind
+        source: ./frontend
+        target: /app
+    ports: 
+      - 3000:3000
+    networks: 
+      - public
+
   backend:
     image: zscraper-backend
     build: 
