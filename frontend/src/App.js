@@ -1,10 +1,11 @@
 import React from 'react';
-import { BrowserRouter, Route } from 'react-router-dom';
+import { BrowserRouter, Switch, Route } from 'react-router-dom';
 
 import AboutPage from './pages/AboutPage';
 import ArticlePage from './pages/ArticlePage';
 import ArticleListPage from './pages/ArticlesListPage';
 import HomePage from './pages/HomePage';
+import NotFoundPage from './pages/NotFoundPage';
 
 import NavBar from './components/NavBar';
 
@@ -16,6 +17,7 @@ function App() {
       <div className="App">
         <NavBar />
         <div id="page-body">
+          <Switch>
           <Route path="/" exact>
             <HomePage />
           </Route>
@@ -28,6 +30,10 @@ function App() {
           <Route path="/article/:name">
             <ArticlePage />
           </Route>
+          <Route>
+            <NotFoundPage/>
+          </Route>
+          </Switch>
         </div>
       </div>
     </BrowserRouter>
