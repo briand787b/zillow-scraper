@@ -3,12 +3,12 @@ version: "3.7"
 services:
   frontend:
     image: zscraper-frontend
-    build: ./frontend
+    build: ./frontend/react
     # react app exits w/ code 0 w/o this
     stdin_open: true 
     volumes:
       - type: bind
-        source: ./frontend
+        source: ./frontend/react
         target: /app
     ports: 
       - 3000:3000
@@ -18,7 +18,7 @@ services:
   backend:
     image: zscraper-backend
     build: 
-      context: ./backend
+      context: ./backend/go
       args:
         - arch=amd64
       dockerfile: ./api/Dockerfile 
