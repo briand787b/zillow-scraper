@@ -14,9 +14,11 @@ services:
       - 3000:3000
     networks: 
       - public
+    depends_on: 
+      - backend-node
 
-  backend:
-    image: zscraper-backend
+  backend-go:
+    image: zscraper-backend-go
     build: 
       context: ./backend/go
       args:
@@ -30,6 +32,20 @@ services:
       - private
     depends_on: 
       - redis
+
+  backend-node:
+    image: zscraper-backend-node
+    build:
+      ./backend/node
+    volumes:
+      - type: bind
+        source: ./backend/node
+        target: /app
+    ports:
+      - 8000:8000
+    networks:
+      - public
+      - private
 
   redis:
     image: redis:6.0

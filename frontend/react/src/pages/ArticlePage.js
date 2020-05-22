@@ -6,7 +6,7 @@ import NotFoundPage from './NotFoundPage'
 const ArticlePage = () => {
     const { name } = useParams();
 
-    const article = articles.find(article => article.name == name );
+    const article = articles.find(article => article.name === name );
 
     return article 
         ? (
