@@ -1,11 +1,6 @@
 import express from 'express';
 import bodyParser from 'body-parser';
-
-const articlesInfo = {
-    'learn-react': { upvotes: 0, comments: [] },
-    'learn-node': { upvotes: 0, comments: []},
-    'my-thoughts-on-resumes': { upvotes: 0, comments: []}
-};
+import { MongoClient } from 'mongodb';
 
 const app = express();
 app.use(bodyParser.json());
@@ -18,6 +13,33 @@ app.get('hello/:name', (req, res) => {
 app.post('/hello', (req, res) => {
     const name = req.body.name;
     res.send(`Hello ${name}!!!!`);
+});
+
+app.get('/api/articles/:name', async (req, res) => {
+    const articleName = req.params.name;
+    
+    try {
+        const client = await MongoClient.connect(
+            'mongodb://zcrapr:zcrapr@mongo:27017',
+            {useNewUrlParser: true, useUnifiedTopology: true}
+        );
+    
+        const db = client.db('zcrapr');
+        
+        const articleInfo = await db.collection('articles')
+            .findOne({ name: articleName });
+        
+        client.close();
+        
+        if (!articleInfo) {
+            return res.status(404).send('article not found');
+        }
+    
+        res.status(200).json(articleInfo);
+    } catch (e) {
+        console.log(e);
+        res.status(500).send('something went wrong');
+    }
 });
 
 app.post('/api/articles/:name/upvote', (req, res) => {

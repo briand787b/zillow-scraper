@@ -54,8 +54,23 @@ services:
     networks:
       - private
 
+  mongo:
+    build:
+      ./database/mongo
+    environment: 
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME:-zcrapr}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD:-zcrapr}
+      MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE:-zcrapr}
+    volumes:
+      - mongo_data:/data
+    ports:
+      - 27017:27017
+    networks: 
+      - private
+
 volumes: 
   redis_data:
+  mongo_data:
 
 networks:
   public:
