@@ -1,15 +1,6 @@
-FROM node:14.2
-
+FROM node:14.3
 WORKDIR /app
-
-ENV PATH /app/node_modules/.bin:$PATH
-
-COPY package.json \
-    package-lock.json \
-    /app/
-
+COPY package*.json /app/
 RUN npm install
-
 COPY . /app/
-
 CMD [ "npm", "start" ]

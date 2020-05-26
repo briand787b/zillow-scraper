@@ -1,9 +1,6 @@
 import React from 'react';
 import { BrowserRouter, Switch, Route } from 'react-router-dom';
 
-import AboutPage from './pages/AboutPage';
-import ArticlePage from './pages/ArticlePage';
-import ArticleListPage from './pages/ArticlesListPage';
 import HomePage from './pages/HomePage';
 import NotFoundPage from './pages/NotFoundPage';
 
@@ -20,15 +17,6 @@ function App() {
           <Switch>
           <Route path="/" exact>
             <HomePage />
-          </Route>
-          <Route path="/about" >
-            <AboutPage />
-          </Route>
-          <Route path="/articles-list">
-            <ArticleListPage />
-          </Route>
-          <Route path="/article/:name">
-            <ArticlePage />
           </Route>
           <Route>
             <NotFoundPage/>
