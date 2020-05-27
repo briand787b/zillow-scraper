@@ -11,7 +11,7 @@ import './App.css';
 function App() {
   return (
     <BrowserRouter>
-      <div className="App">
+      <div className="container">
         <NavBar />
         <div id="page-body">
           <Switch>
