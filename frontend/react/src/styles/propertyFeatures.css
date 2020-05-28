@@ -1,0 +1,12 @@
+.features {
+    display: flex;
+    flex-direction: column;
+}
+
+.features > h4 {
+    text-align: center;
+}
+
+.features-list {
+    list-style-type: none;
+}

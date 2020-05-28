@@ -1,3 +1,7 @@
+install:
+	docker-compose build frontend
+	docker-compose run --rm frontend npm install
+
 run:
 	docker-compose down --remove-orphans
 	docker-compose build

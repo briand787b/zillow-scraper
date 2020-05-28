@@ -1,15 +1,17 @@
 import React from 'react';
 
+import PropertyFeatures from './PropertyFeatures';
+
 import '../styles/property.css';
 
 const Property = ({ id, url, imageURL, acreage, address }) => (
     <li key={id}>
-        <h3 className="address">address: {address}</h3>
         <div className="property">
-            <img className="property-image" src={imageURL} />
-            <p className="acreage">>acreage: {acreage}</p>
+            <h3 className="address">{address}</h3>
+            <img className="property-image" src={imageURL} alt={address}/>
+            <PropertyFeatures {...{acreage}}/>
+            <a className="url" href={url}>Visit Property</a>
         </div>
-        <p className="url" >url: {url}</p>
     </li>
 )
 

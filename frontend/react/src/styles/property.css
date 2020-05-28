@@ -1,3 +1,25 @@
 .property {
+    background-color: white;
+    margin-top: 1em;
+    padding: 0 1em;
+    display: grid;
+    grid-template-columns: 700px 1fr;
+    grid-template-rows: 1fr 500px 1fr;
+}
+
+.address {
+    grid-column: span 2;
+    text-align: center;
+}
+
+.property-image {
+    height: 500px;
+    width: 700px;
+}
+
+.url {
+    grid-column: span 2;
     display: flex;
+    justify-content: center;
+    align-items: center;
 }
