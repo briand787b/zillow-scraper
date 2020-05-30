@@ -1,0 +1,8 @@
+.property-grid-item {
+    background-color: violet;
+    margin: 0;
+}
+
+.property-grid-item img {
+    max-width: 100%;
+}

@@ -4,15 +4,13 @@ import PropertyFeatures from './PropertyFeatures';
 
 import '../styles/property.css';
 
-const Property = ({ id, url, imageURL, acreage, address }) => (
-    <li key={id}>
+const Property = ({ url, imageURL, acreage, address, currentPrice, recentChange }) => (
         <div className="property">
             <h3 className="address">{address}</h3>
             <img className="property-image" src={imageURL} alt={address}/>
-            <PropertyFeatures {...{acreage}}/>
+            <PropertyFeatures {...{acreage, currentPrice, recentChange}}/>
             <a className="url" href={url}>Visit Property</a>
         </div>
-    </li>
 )
 
 export default Property;
