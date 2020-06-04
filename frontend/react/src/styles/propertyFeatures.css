@@ -1,42 +1,38 @@
 .features {
+    padding: 1em;
     display: flex;
     flex-direction: column;
 }
 
-.features > h4 {
+.features>h4 {
     text-align: center;
+    /* font-weight: bold; */
 }
 
 .cost {
-    display: flex;                        
+    display: flex;
     justify-content: center;
     align-items: center;
     line-height: .7;
-  }
-  
-  .cost > span {
+    margin-bottom: 1em;
+}
+
+.cost>span {
     margin-top: 0;
-  }
-  
-  .cost-currency {
+}
+
+.cost-currency {
     font-size: 2rem;
-  }
-  .cost-dollars {
+}
+
+.cost-dollars {
     font-size: 4rem;
-  }
-  .cost-cents {
-    font-size: 1.5rem;
-    align-self: flex-start;
-  }
-  
-  .cta-button {
+}
+
+.cta-button {
     display: block;
     background-color: #cc6b5a;
     color: white;
     padding: .5em 1em;
     text-decoration: none;
-  }
-
-  .price {
-      color: red;
-  }
+}

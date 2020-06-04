@@ -2,9 +2,14 @@
     background-color: white;
     margin-top: 1em;
     padding: 0 1em;
+    border-radius: 0.5em;
     display: grid;
     grid-template-columns: 700px 1fr;
     grid-template-rows: 1fr 500px 1fr;
+}
+
+.property > h3 {
+    /* font-size: 1rem; */
 }
 
 .address {

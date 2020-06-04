@@ -2,10 +2,26 @@ import React from 'react';
 
 import '../styles/propertyGridItem.css';
 
-const PropertyGridItem = ({ url, imageURL, acreage, address, currentPrice, recentChange }) => (
+const PropertyPrice = (status, price, pctChange) => (
+    status === "For Sale" ? <div></div> : <div></div>
+);
+
+const PropertyStatus = (status, price, pctChange) => {
+    switch (status) {
+        case "For Sale":
+            return (<span>${price} {status}</span>)
+        default:
+            return (<span>{status}</span>)
+    }
+}
+
+const PropertyGridItem = ({ url, imageURL, acreage, address, currentPrice, priceChangePercent, status }) => (
     <div className="property-grid-item">
-        <span>I'm a grid item</span>
+        <div className="property-grid-item-header">
+            {PropertyStatus(status, currentPrice, priceChangePercent)}
+        </div>
         <img src={imageURL} alt={address} />
+        <span>Recent Change: {}</span>
     </div>
 );
 

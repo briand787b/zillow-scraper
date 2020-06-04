@@ -11,7 +11,7 @@ const properties = [
         imageURL: "https://photos.zillowstatic.com/cc_ft_768/ISfozz6yhd1onw0000000000.webp",
         acreage: 200,
         address: "42 Baker St, Whoville, Kentucky 30067",
-        currentPrice: 30000,
+        currentPrice: 300000,
         recentChange: 1.0,
     },
     {
@@ -20,7 +20,7 @@ const properties = [
         imageURL: "https://photos.zillowstatic.com/cc_ft_768/ISjj2m3xc23iwo1000000000.webp",
         acreage: 100,
         address: "1057 Della St SE, Marietta, Georgia 30067",
-        currentPrice: 24000,
+        currentPrice: 240000,
         recentChange: -8.0,
     },
     {
