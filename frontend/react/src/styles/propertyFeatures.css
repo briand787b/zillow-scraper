@@ -36,3 +36,28 @@
     padding: .5em 1em;
     text-decoration: none;
 }
+
+.address {
+    text-align: center;
+}
+
+.specs{
+    display: flex;
+    flex-direction: column;
+}
+
+.specs > * {
+    margin-top: .25em
+}
+
+.acreage {
+    text-align: center;
+}
+
+.map {
+    background-color: aqua;
+    height: 100px;
+}
+
+.url {
+}
