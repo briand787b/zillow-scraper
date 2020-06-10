@@ -15,7 +15,7 @@ import (
 
 const (
 	// CorsEnvVarKey is the key used to get the CORS host
-	CorsEnvVarKey = "PL_CORS_HOST"
+	CorsEnvVarKey = "ZS_CORS_HOST"
 )
 
 // Middleware acts as a bridge between the request and the controllers

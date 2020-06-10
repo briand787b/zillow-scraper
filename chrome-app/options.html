@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Zillow Scraper Options </title>
+    <style>
+        .content {
+            width: 1080px;
+            margin: 0 auto;
+        }
+
+        .flex-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .form-group {
+            background-color: rgb(239, 239, 239);
+            border-radius: .25em;
+            padding: 1em;
+            margin: 1em auto;
+            border: 2px solid black;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .submit {
+            margin: 1em auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .submit>button {
+            padding: 0.5em 1em;
+            background-color: white;
+        }
+
+        form>* {
+            margin-right: 1em;
+        }
+
+        .host-input {
+            width: 20em;
+        }
+
+        .favorite-input-group {
+            margin: 1em auto;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="content">
+        <div class="flex-content">
+            <h1>Zillow Scraper Options</h1>
+            <div class="form-group">
+                <h3>Server Configuration</h3>
+                <form id="server-host-url-form">
+                    <label for="server-host-url">Host URL</labeL>
+                    <input class="host-input" type="text" id="server-host-url" name="server-host-url">
+                    <div class="submit">
+                        <button type="submit">Save Host URL</button>
+                    </div>
+            </div>
+            <div class="form-group">
+                </form>
+                <h3>Favorites To Scrape</h3>
+                <form id="property-selection"></form>
+            </div>
+        </div>
+    </div>
+    <script src="options.js"></script>
+</body>
+
+</html>

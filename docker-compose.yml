@@ -23,6 +23,8 @@ services:
         - arch=amd64
       dockerfile: ./api/Dockerfile 
     command: [ "/root/app", "--port", "8080" ]
+    environment: 
+      - ZS_CORS_HOST=*
     ports:
       - 8080:8080
     networks:
