@@ -17,5 +17,14 @@
         "persistent": false
     },
     "options_page": "options.html",
-    "permissions": ["storage"]
+    "content_scripts": [{
+        "matches": [
+            "https://www.zillow.com/*"
+        ],
+        "js": ["contentScript.js"]
+    }],
+    "permissions": [
+        "storage",
+        "tabs"
+    ]
 }

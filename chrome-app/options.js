@@ -16,7 +16,7 @@ chrome.storage.sync.get(['host', 'favorite_ids'], async ({ host, favorite_ids })
 
     document.getElementById('server-host-url').setAttribute('value', host);
 
-    const resp = await fetch(host);
+    const resp = await fetch(host + "/properties?take=10");
     const respJSON = await resp.json();
 
     console.log(respJSON);

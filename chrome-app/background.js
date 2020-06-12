@@ -1,17 +1,42 @@
-chrome.runtime.onInstalled.addListener(() => {
-    chrome.browserAction.onClicked.addListener(() => {
-        console.log('Clicked');
+class Scraper {
+  constructor(favoriteURLs) {
+    this.favoriteURLs = favoriteURLs;
+    chrome.runtime.onMessage.addListener(this.receiveMessage);
+  }
 
-        chrome.storage.sync.set({
-            urls: [
-                "https://www.zillow.com/homedetails/410-Retreat-St-Westminster-SC-29693/111164824_zpid/",
-                "https://www.zillow.com/homedetails/246-Little-Choestoea-Rd-Westminster-SC-29693/70955580_zpid/",
-                "https://www.zillow.com/homedetails/200-Harbour-West-Dr-Westminster-SC-29693/70960114_zpid/",
-            ]
-        });
-
-        chrome.storage.sync.get("urls", (result) => {
-            console.log(result);
-        });
+  scrape() {
+    chrome.tabs.create({}, (tab) => {
+      this.tab = tab;
+      this.travel();
     });
+  }
+
+  travel() {
+    const url = this.favoriteURLs.shift();
+    if (!url) {
+      return;
+    }
+
+    chrome.tabs.update(this.tab.id, {url});
+  }
+
+  receiveMessage = (request, sender, sendResponse) => {
+    console.log(request);
+    this.travel();
+  }
+}
+
+// See if there appears to be more than one listener added
+// for this event.  If there is, then wrap this in a
+// listener for the chrome extension installation
+chrome.browserAction.onClicked.addListener(() => {
+  chrome.storage.sync.get(['favorite_urls'], ({ favorite_urls }) => {
+    // TODO: remove this temporary override for a value that does not exist
+    favorite_urls = [
+      'https://www.zillow.com/homedetails/122-Eastwood-Cir-Westminster-SC-29693/70950821_zpid/',
+      'https://www.zillow.com/homedetails/328-Holly-Dr-Westminster-SC-29693/218227134_zpid/',
+    ];
+
+    new Scraper(favorite_urls).scrape();
+  });
 });
