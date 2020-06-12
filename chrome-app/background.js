@@ -1,5 +1,6 @@
 class Scraper {
   constructor(favoriteURLs) {
+    console.log(favoriteURLs);
     this.favoriteURLs = favoriteURLs;
     chrome.runtime.onMessage.addListener(this.receiveMessage);
   }
@@ -30,13 +31,7 @@ class Scraper {
 // for this event.  If there is, then wrap this in a
 // listener for the chrome extension installation
 chrome.browserAction.onClicked.addListener(() => {
-  chrome.storage.sync.get(['favorite_urls'], ({ favorite_urls }) => {
-    // TODO: remove this temporary override for a value that does not exist
-    favorite_urls = [
-      'https://www.zillow.com/homedetails/122-Eastwood-Cir-Westminster-SC-29693/70950821_zpid/',
-      'https://www.zillow.com/homedetails/328-Holly-Dr-Westminster-SC-29693/218227134_zpid/',
-    ];
-
-    new Scraper(favorite_urls).scrape();
+  chrome.storage.sync.get(['favorites'], ({ favorites }) => {
+    new Scraper(favorites.map((f) => f.url)).scrape();
   });
 });
