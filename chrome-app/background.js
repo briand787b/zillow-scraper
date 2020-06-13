@@ -1,37 +1,43 @@
 class Scraper {
-  constructor(favoriteURLs) {
-    console.log(favoriteURLs);
-    this.favoriteURLs = favoriteURLs;
-    chrome.runtime.onMessage.addListener(this.receiveMessage);
-  }
-
-  scrape() {
-    chrome.tabs.create({}, (tab) => {
-      this.tab = tab;
-      this.travel();
-    });
-  }
-
-  travel() {
-    const url = this.favoriteURLs.shift();
-    if (!url) {
-      return;
+    constructor() {
+        chrome.runtime.onMessage.addListener(this.receiveMessage);
     }
 
-    chrome.tabs.update(this.tab.id, {url});
-  }
+    scrape(host, favoriteURLs) {
+        console.log(favoriteURLs);
+        this.favoriteURLs = favoriteURLs;
+        this.host = host;
+        chrome.tabs.create({}, (tab) => {
+            this.tab = tab;
+            this.travel();
+        });
+    }
 
-  receiveMessage = (request, sender, sendResponse) => {
-    console.log(request);
-    this.travel();
-  }
+    travel() {
+        const url = this.favoriteURLs.shift();
+        if (!url) {
+            return;
+        }
+
+        chrome.tabs.update(this.tab.id, { url });
+    }
+
+    receiveMessage = (request, sender, sendResponse) => {
+        console.log(request);
+        if (request.price) {
+            console.log('POSTing to server')
+            // TODO: POST to server
+        }
+
+        this.travel();
+    }
 }
 
-// See if there appears to be more than one listener added
-// for this event.  If there is, then wrap this in a
-// listener for the chrome extension installation
-chrome.browserAction.onClicked.addListener(() => {
-  chrome.storage.sync.get(['favorites'], ({ favorites }) => {
-    new Scraper(favorites.map((f) => f.url)).scrape();
-  });
+chrome.runtime.onInstalled.addListener(() => {
+    const scraper = new Scraper();
+    chrome.browserAction.onClicked.addListener(() => {
+        chrome.storage.sync.get(['host', 'favorites'], ({ host, favorites }) => {
+            scraper.scrape(host, favorites.map((f) => f.url));
+        });
+    });
 });
