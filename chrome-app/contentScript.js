@@ -13,9 +13,9 @@ const price = prices.iterateNext();
 console.log(price);
 
 if (price) {
+    chrome.runtime.sendMessage({
+        price: price.innerHTML,
+    });
+} else {
     chrome.runtime.sendMessage({});
 }
-
-chrome.runtime.sendMessage({
-    price: price.innerHTML,
-});

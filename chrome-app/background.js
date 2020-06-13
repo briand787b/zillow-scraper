@@ -7,7 +7,7 @@ class Scraper {
         console.log(favoriteURLs);
         this.favoriteURLs = favoriteURLs;
         this.host = host;
-        chrome.tabs.create({}, (tab) => {
+        chrome.tabs.create({ active: false }, (tab) => {
             this.tab = tab;
             this.travel();
         });
@@ -23,7 +23,7 @@ class Scraper {
     }
 
     receiveMessage = (request, sender, sendResponse) => {
-        console.log(request);
+        console.log("request", request);
         if (request.price) {
             console.log('POSTing to server')
             // TODO: POST to server
