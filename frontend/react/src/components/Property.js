@@ -4,10 +4,10 @@ import PropertyFeatures from './PropertyFeatures';
 
 import '../styles/property.css';
 
-const Property = ({ url, imageURL, acreage, address, currentPrice, recentChange }) => (
+const Property = ({ id, url, imageURL, acreage, address, currentPrice, recentChange }) => (
         <div className="property">
             <img className="property-image" src={imageURL} alt={address}/>
-            <PropertyFeatures {...{acreage, address, currentPrice, recentChange, url}}/>
+            <PropertyFeatures {...{acreage, address, currentPrice, id, recentChange, url}}/>
         </div>
 )
 

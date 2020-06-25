@@ -2,7 +2,7 @@ import React from 'react';
 
 import '../styles/propertyFeatures.css';
 
-const PropertyFeatures = ({ acreage, address, currentPrice, recentChange, url }) => (
+const PropertyFeatures = ({ acreage, address, currentPrice, id, recentChange, url }) => (
     <div className="features">
         <div className="cost">
             <span className="cost-currency">$</span>
@@ -18,6 +18,7 @@ const PropertyFeatures = ({ acreage, address, currentPrice, recentChange, url })
                     width="300"
                     height="300"
                     frameborder="0"
+                    title="id"
                     src={`https://www.google.com/maps/embed/v1/place?key=AIzaSyB76MwBO4v3QDDYLy6o4r7DpOBESqFcZ7A&q=${encodeURIComponent(address)}`}
                     allowfullscreen
             ></iframe>
