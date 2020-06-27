@@ -1,3 +1,16 @@
+// storage schema
+// {
+//    "host": "string"m
+//    "favorites": [
+//      {
+//        "id": "string",
+//        "address": "string",
+//        "url": "string"
+//      } 
+//    ]  
+// }
+// 
+
 document.getElementById('server-host-url-form').addEventListener('submit', (event) => {
     const host = document.getElementById('server-host-url').value;
     chrome.storage.sync.set({ host: host }, () => { });
@@ -7,22 +20,21 @@ document.getElementById('server-host-url-form').addEventListener('submit', (even
 // chrome.storage.sync.set({ favorites: [{"id:0001": "address}"] }, () => { });
 
 chrome.storage.sync.get(['host', 'favorites'], async ({ host, favorites }) => {
-    console.log(host);
-    console.log(favorites);
+    console.log('host', host);
+    console.log('favorites', favorites);
 
     if (typeof (host) !== "string") {
         throw new Error(`Host is not a string value, is ${typeof host}`)
     }
 
     document.getElementById('server-host-url').setAttribute('value', host);
+    const propertySelectionForm = document.getElementById('property-selection');
 
     const resp = await fetch(host + "/properties?take=10");
     const respJSON = await resp.json();
 
-    console.log(respJSON);
-
-    const propertySelectionForm = document.getElementById('property-selection');
     const propertiesList = respJSON.properties
+    console.log('propertiesList', propertiesList);
     for (const property of propertiesList) {
         const favoriteDiv = document.createElement('div');
         favoriteDiv.setAttribute('class', 'favorite-input-group')
@@ -33,9 +45,8 @@ chrome.storage.sync.get(['host', 'favorites'], async ({ host, favorites }) => {
         input.setAttribute('name', property.address);
         input.setAttribute('value', property.address);
         input.setAttribute('url', property.url);
-        if (favorites && favorites.length > 1) {
-            const found = favorites.find(({id}) => id === property.id);
-            console.log(found);
+        if (favorites && favorites.length > 0) {
+            const found = favorites.find(({ id }) => id === property.id);
             if (found !== undefined) {
                 input.checked = true;
             }
@@ -65,21 +76,21 @@ chrome.storage.sync.get(['host', 'favorites'], async ({ host, favorites }) => {
 
 document.getElementById('property-selection').addEventListener('submit', (event) => {
     // document.getElementById().getAttribute();
-    console.log(event.target);
-    console.log(event.target.tagName);
-    console.log(event.target.children);
-    console.log(event.target.children.item(0));
+    // console.log('event.target', event.target);
+    // console.log('event.target.tagName', event.target.tagName);
+    // console.log('event.target.children', event.target.children);
+    // console.log('event.target.children.item(0)', event.target.children.item(0));
 
     const newFavorites = [];
     let inputElem;
     for (const child of event.target.children) {
-        console.log(child);
+        // console.log(child);
         if (child.className !== 'favorite-input-group') {
             continue;
         }
 
         inputElem = child.children.item(0);
-        console.log(`checked? ${inputElem.checked}`);
+        // console.log(`checked? ${inputElem.checked}`);
         if (inputElem.checked) {
             newFavorites.push({
                 id: inputElem.getAttribute('id'),
@@ -89,7 +100,7 @@ document.getElementById('property-selection').addEventListener('submit', (event)
         }
     }
 
-    console.log(newFavorites);
+    console.log('newFavorites', newFavorites);
     chrome.storage.sync.set({ 'favorites': newFavorites }, () => {
         console.log('saved new favorites');
     });
