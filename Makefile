@@ -1,6 +1,6 @@
 install:
-	docker-compose build frontend
-	docker-compose run --rm frontend npm install
+	docker-compose build chrome-app
+	docker-compose run --rm --no-deps chrome-app npm install
 
 run:
 	docker-compose down --remove-orphans

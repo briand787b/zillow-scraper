@@ -1,5 +1,4 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
 
 // IMPORTANT: this app will not work in a chrome extension without this:
