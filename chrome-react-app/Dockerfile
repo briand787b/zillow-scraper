@@ -19,5 +19,5 @@ RUN npm install
 COPY . ./
 
 # run watchman
-RUN watchman -- trigger /usr/local/src/src rebuild '*.js' -- npm run build
-CMD [ "watchman", "--foreground", "--logfile=/dev/stdout", "watch", "/usr/local/src/src"]
+RUN watchman -- trigger /usr/local/src/src rebuild '*' -- npm run build
+CMD [ "watchman", "--foreground", "--logfile=/dev/stdout", "watch-project", "/usr/local/src/src"]
