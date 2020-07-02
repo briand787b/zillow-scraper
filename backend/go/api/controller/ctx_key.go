@@ -4,6 +4,6 @@ type ctxKey int
 
 const (
 	propertyCtxKey ctxKey = iota
-	skipCtxKey
+	// skipCtxKey
 	takeCtxKey
 )

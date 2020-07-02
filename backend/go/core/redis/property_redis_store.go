@@ -3,6 +3,7 @@ package redis
 import (
 	"context"
 	"fmt"
+	"math"
 	"strconv"
 
 	"zcrapr/core/model"
@@ -22,11 +23,12 @@ type PropertyRedisStore struct {
 	idCounterKey string
 	idPrefix     string
 	idWidth      string
+	maxCursor    uint
 }
 
 // NewPropertyRedisStore returns a new PropertyStore backed by Redis
 func NewPropertyRedisStore(l plog.Logger, idCounterKey, idPrefix, host, password string,
-	idWidth, port uint) (*PropertyRedisStore, error) {
+	idWidth, maxCursor, port uint) (*PropertyRedisStore, error) {
 
 	if idCounterKey == "" {
 		return nil, perr.NewErrInvalid("idCounterKey cannot be empty string")
@@ -62,7 +64,7 @@ func NewPropertyRedisStore(l plog.Logger, idCounterKey, idPrefix, host, password
 }
 
 // GetAllPropertyIDs x
-func (s *PropertyRedisStore) GetAllPropertyIDs(ctx context.Context, skip, take int) ([]string, error) {
+func (s *PropertyRedisStore) GetAllPropertyIDs(ctx context.Context, take int) ([]string, error) {
 	var allKeys []string
 	var nextKeys []string
 	var err error
@@ -80,6 +82,27 @@ func (s *PropertyRedisStore) GetAllPropertyIDs(ctx context.Context, skip, take i
 		}
 
 		if len(allKeys) >= take {
+			break
+		}
+	}
+
+	return allKeys, nil
+}
+
+// GetPropertiesByAddress x
+func (s *PropertyRedisStore) GetPropertiesByAddress(ctx context.Context, address string) ([]model.Property, error) {
+	var allKeys []string
+	var nextKeys []string
+	var err error
+	var cursor uint64
+	for {
+		nextKeys, cursor, err = s.client.Scan(cursor, address+"*", math.MaxInt32).Result()
+		if err != nil {
+			return nil, perr.NewErrInternal(errors.Wrap(err, "could not execute Redis command"))
+		}
+
+		allKeys = append(allKeys, nextKeys...)
+		if cursor == 0 {
 			break
 		}
 	}

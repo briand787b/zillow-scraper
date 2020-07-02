@@ -61,19 +61,13 @@ func (m *PropertyResponse) Render(w http.ResponseWriter, r *http.Request) error 
 // PropertyResponseList represents a list of Property
 type PropertyResponseList struct {
 	Properties []PropertyResponse `json:"properties"`
-	Skip       int                `json:"skip"`
-	Take       int                `json:"take"`
-	NextSkip   int                `json:"next_skip,omitempty"`
 
 	ps []model.Property
 }
 
 // NewPropertyResponseList converts a slice of model.Property into a PropertyResponseList
-func NewPropertyResponseList(mps []model.Property, skip, take int) *PropertyResponseList {
+func NewPropertyResponseList(mps []model.Property) *PropertyResponseList {
 	return &PropertyResponseList{
-		Skip: skip,
-		Take: take,
-
 		ps: mps,
 	}
 }
@@ -86,10 +80,6 @@ func (l *PropertyResponseList) Render(w http.ResponseWriter, r *http.Request) er
 		if err := l.Properties[i].Render(nil, nil); err != nil {
 			return perr.NewErrInternal(errors.Wrap(err, "could not bind PropertyResponse"))
 		}
-	}
-
-	if len(l.Properties) >= l.Take {
-		l.NextSkip = l.Skip + l.Take
 	}
 
 	return nil

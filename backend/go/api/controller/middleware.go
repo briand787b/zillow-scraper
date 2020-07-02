@@ -71,11 +71,11 @@ func (m *Middleware) disableCORS(next http.Handler) http.Handler {
 
 func (m *Middleware) skipTake(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		s, err := getSkip(r)
-		if err != nil {
-			render.Render(w, r, perr.NewValidationHTTPErrorFromError(r.Context(), err, "could not get skip", m.l)) // NOTE: THIS IS NOT THE CORRECT RESPONSE, JUST TESTING...
-			return
-		}
+		// s, err := getSkip(r)
+		// if err != nil {
+		// 	render.Render(w, r, perr.NewValidationHTTPErrorFromError(r.Context(), err, "could not get skip", m.l)) // NOTE: THIS IS NOT THE CORRECT RESPONSE, JUST TESTING...
+		// 	return
+		// }
 
 		t, err := getTake(r)
 		if err != nil {
@@ -83,28 +83,30 @@ func (m *Middleware) skipTake(next http.Handler) http.Handler {
 			return
 		}
 
-		ctx := context.WithValue(r.Context(), skipCtxKey, s)
-		ctx = context.WithValue(ctx, takeCtxKey, t)
+		// ctx := context.WithValue(r.Context(), skipCtxKey, s)
+		// ctx = context.WithValue(ctx, takeCtxKey, t)
+
+		ctx := context.WithValue(r.Context(), takeCtxKey, t)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
 
-// getSkip returns the value of the skip query string parameter
-// It defaults to 0 if not provided. However, it does return an error if
-// it exists but cannot be converted to an integer
-func getSkip(r *http.Request) (int, error) {
-	s := r.URL.Query().Get("skip")
-	if s == "" {
-		return 0, nil
-	}
+// // getSkip returns the value of the skip query string parameter
+// // It defaults to 0 if not provided. However, it does return an error if
+// // it exists but cannot be converted to an integer
+// func getSkip(r *http.Request) (int, error) {
+// 	s := r.URL.Query().Get("skip")
+// 	if s == "" {
+// 		return 0, nil
+// 	}
 
-	sI, err := strconv.Atoi(s)
-	if err != nil {
-		return 0, errors.Wrap(err, "could not convert skip parameter to int")
-	}
+// 	sI, err := strconv.Atoi(s)
+// 	if err != nil {
+// 		return 0, errors.Wrap(err, "could not convert skip parameter to int")
+// 	}
 
-	return sI, nil
-}
+// 	return sI, nil
+// }
 
 // getTake returns the value of the take query string parameter
 // It defaults to 100 if not provided. However, it does return an error if

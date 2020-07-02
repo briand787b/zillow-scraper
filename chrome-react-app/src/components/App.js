@@ -14,7 +14,7 @@ class App extends React.Component {
     }
 
     async componentDidMount() {
-        const properties = await this.state.backendClient.getProperties(10)
+        const properties = await this.state.backendClient.getProperties()
         this.setState({ properties: properties});
     }
 

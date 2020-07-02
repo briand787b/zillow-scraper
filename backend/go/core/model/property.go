@@ -3,13 +3,12 @@ package model
 import (
 	"context"
 	"fmt"
+	"math"
 	"zcrapr/core/perr"
 	"zcrapr/core/plog"
 
 	"github.com/pkg/errors"
 )
-
-const maxPropertyTake = 1
 
 // Property represents a Property
 type Property struct {
@@ -36,20 +35,16 @@ func GetPropertyByID(ctx context.Context, l plog.Logger, id string, ps PropertyS
 }
 
 // GetAllProperties retrieves all Properties
-func GetAllProperties(ctx context.Context, l plog.Logger, skip, take int, ps PropertyStore) ([]Property, error) {
-	if skip < 0 {
-		return nil, perr.NewErrInvalid("skip cannot be negative")
-	}
+func GetAllProperties(ctx context.Context, l plog.Logger, take int, ps PropertyStore) ([]Property, error) {
+	// if skip < 0 {
+	// 	return nil, perr.NewErrInvalid("skip cannot be negative")
+	// }
 
 	if take < 1 {
-		return nil, perr.NewErrInvalid("take must be at least 1")
+		take = math.MaxInt32
 	}
 
-	if take > maxPropertyTake {
-		return nil, perr.NewErrInvalid(fmt.Sprintf("cannot take more than max (%v)", maxPropertyTake))
-	}
-
-	propIDs, err := ps.GetAllPropertyIDs(ctx, skip, take)
+	propIDs, err := ps.GetAllPropertyIDs(ctx, take)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not get all properties")
 	}
@@ -62,6 +57,20 @@ func GetAllProperties(ctx context.Context, l plog.Logger, skip, take int, ps Pro
 		}
 
 		props[i] = *prop
+	}
+
+	return props, nil
+}
+
+// GetPropertiesByAddress gets all properties that match the address
+func GetPropertiesByAddress(ctx context.Context, l plog.Logger, address string, ps PropertyStore) ([]Property, error) {
+	if address == "" {
+		return nil, perr.NewErrInvalid("could not search by address with empty address")
+	}
+
+	props, err := ps.GetPropertiesByAddress(ctx, address)
+	if err != nil {
+		return nil, errors.Wrap(err, "could not get properties by address")
 	}
 
 	return props, nil

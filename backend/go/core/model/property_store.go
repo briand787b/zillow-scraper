@@ -4,7 +4,8 @@ import "context"
 
 // PropertyStore is anything that can store Propertyes
 type PropertyStore interface {
-	GetAllPropertyIDs(ctx context.Context, skip, take int) ([]string, error)
+	GetAllPropertyIDs(ctx context.Context, take int) ([]string, error)
+	GetPropertiesByAddress(ctx context.Context, address string) ([]Property, error)
 	GetPropertyByID(ctx context.Context, id string) (*Property, error)
 	GetPropertyIDByAddress(ctx context.Context, address string) (string, error)
 	GetPropertyIDByURL(ctx context.Context, url string) (string, error)

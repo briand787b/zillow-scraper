@@ -75,17 +75,31 @@ func (c *PropertyController) HandleGetByID(w http.ResponseWriter, r *http.Reques
 	render.Render(w, r, NewPropertyResponse(m))
 }
 
+// HandleGetByAddress gets all properties by the provided address
+func (c *PropertyController) HandleGetByAddress(w http.ResponseWriter, r *http.Request) {
+	addr := r.URL.Query().Get("address")
+
+	ctx := r.Context()
+	props, err := model.GetPropertiesByAddress(ctx, c.l, addr, c.ps)
+	if err != nil {
+		render.Render(w, r, perr.NewHTTPErrorFromError(ctx, err, "could not get property by address", c.l))
+		return
+	}
+
+	render.Render(w, r, NewPropertyResponseList(props))
+}
+
 // HandleGetAll handles requests to get all the properties
 func (c *PropertyController) HandleGetAll(w http.ResponseWriter, r *http.Request) {
-	skip := r.Context().Value(skipCtxKey).(int)
+	// skip := r.Context().Value(skipCtxKey).(int)
 	take := r.Context().Value(takeCtxKey).(int)
 
 	ctx := r.Context()
-	ps, err := model.GetAllProperties(ctx, c.l, skip, take, c.ps)
+	props, err := model.GetAllProperties(ctx, c.l, take, c.ps)
 	if err != nil {
 		render.Render(w, r, perr.NewHTTPErrorFromError(ctx, err, "could not get all root Media", c.l))
 		return
 	}
 
-	render.Render(w, r, NewPropertyResponseList(ps, 0, 0))
+	render.Render(w, r, NewPropertyResponseList(props))
 }

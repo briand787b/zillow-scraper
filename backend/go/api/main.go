@@ -30,7 +30,7 @@ func main() {
 	}
 
 	// TODO: grab these from env vars
-	ps, err := redis.NewPropertyRedisStore(l, "id-counter", "id", "redis", "", 4, 6379)
+	ps, err := redis.NewPropertyRedisStore(l, "id-counter", "id", "redis", "", 4, 1024, 6379)
 	if err != nil {
 		log.Fatalln(err)
 	}
