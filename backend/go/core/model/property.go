@@ -9,7 +9,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-const maxPropertyTake = 100
+const maxPropertyTake = 1
 
 // Property represents a Property
 type Property struct {

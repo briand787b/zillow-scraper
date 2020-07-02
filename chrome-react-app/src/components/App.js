@@ -14,10 +14,12 @@ class App extends React.Component {
     }
 
     async componentDidMount() {
-        
+        const properties = await this.state.backendClient.getProperties(10)
+        this.setState({ properties: properties});
     }
 
     render() {
+        console.log('state', this.state);
         return (
             <div>
                 <Header setProperties={this.setProperties} />
