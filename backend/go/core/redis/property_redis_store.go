@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math"
 	"strconv"
+	"strings"
 
 	"zcrapr/core/model"
 	"zcrapr/core/perr"
@@ -96,7 +97,7 @@ func (s *PropertyRedisStore) GetPropertiesByAddress(ctx context.Context, address
 	var err error
 	var cursor uint64
 	for {
-		nextKeys, cursor, err = s.client.Scan(cursor, address+"*", math.MaxInt32).Result()
+		nextKeys, cursor, err = s.client.Scan(cursor, "*"+strings.ToLower(address)+"*", math.MaxInt32).Result()
 		if err != nil {
 			return nil, perr.NewErrInternal(errors.Wrap(err, "could not execute Redis command"))
 		}
@@ -107,7 +108,27 @@ func (s *PropertyRedisStore) GetPropertiesByAddress(ctx context.Context, address
 		}
 	}
 
-	return allKeys, nil
+	addrs := s.removeURLs(allKeys)
+	addrs = s.removeIDs(addrs)
+
+	var id string
+	var prop *model.Property
+	props := make([]model.Property, len(addrs))
+	for i, addr := range addrs {
+		id, err = s.GetPropertyIDByAddress(ctx, addr)
+		if err != nil {
+			return nil, errors.Wrap(err, "could not get propertyID by address")
+		}
+
+		prop, err = s.GetPropertyByID(ctx, id)
+		if err != nil {
+			return nil, errors.Wrap(err, "could not get property by ID")
+		}
+
+		props[i] = *prop
+	}
+
+	return props, nil
 }
 
 // GetPropertyByID x
@@ -157,8 +178,8 @@ func (s *PropertyRedisStore) GetPropertyByID(ctx context.Context, id string) (*m
 }
 
 // GetPropertyIDByAddress x
-func (s *PropertyRedisStore) GetPropertyIDByAddress(ctx context.Context, url string) (string, error) {
-	id, err := s.client.Get(url).Result()
+func (s *PropertyRedisStore) GetPropertyIDByAddress(ctx context.Context, address string) (string, error) {
+	id, err := s.client.Get(address).Result()
 	if err != nil {
 		if err == redis.Nil {
 			return "", perr.NewErrNotFound(errors.New("address does not exist in database"))
@@ -199,10 +220,10 @@ func (s *PropertyRedisStore) InsertProperty(ctx context.Context, p *model.Proper
 		"id":      base16ID,
 		"url":     p.URL,
 		"acreage": p.Acreage,
-		"address": p.Address,
+		"address": strings.ToLower(p.Address),
 	})
 	txPipe.Set(p.URL, base16ID, 0)
-	txPipe.Set(p.Address, base16ID, 0)
+	txPipe.Set(strings.ToLower(p.Address), base16ID, 0)
 	if _, err := txPipe.ExecContext(ctx); err != nil {
 		return errors.Wrap(perr.NewErrInternal(err), "could not execute transaction")
 	}
@@ -221,4 +242,28 @@ func (s *PropertyRedisStore) UpdateProperty(ctx context.Context, p *model.Proper
 	}
 
 	return nil
+}
+
+////// HELPER METHODS //////
+
+func (s *PropertyRedisStore) removeIDs(keyList []string) []string {
+	var stripped = make([]string, 0, len(keyList))
+	for _, key := range keyList {
+		if !strings.Contains(key, "id:") {
+			stripped = append(stripped, key)
+		}
+	}
+
+	return stripped
+}
+
+func (s *PropertyRedisStore) removeURLs(keyList []string) []string {
+	var stripped = make([]string, 0, len(keyList))
+	for _, key := range keyList {
+		if !strings.Contains(key, "http") {
+			stripped = append(stripped, key)
+		}
+	}
+
+	return stripped
 }
