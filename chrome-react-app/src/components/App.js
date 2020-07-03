@@ -6,7 +6,7 @@ import BackendClient from '../api/backend';
 class App extends React.Component {
     state = {
         backendClient: new BackendClient('http://localhost:8080'),
-        properties: null,
+        properties: [],
     };
 
     setProperties = (properties) => {
