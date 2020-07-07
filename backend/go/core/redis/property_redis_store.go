@@ -96,10 +96,11 @@ func (s *PropertyRedisStore) GetPropertiesByAddress(ctx context.Context, address
 	var nextKeys []string
 	var err error
 	var cursor uint64
+	searchTerm := "*" + strings.ToLower(address) + "*"
 	for {
-		nextKeys, cursor, err = s.client.Scan(cursor, "*"+strings.ToLower(address)+"*", math.MaxInt32).Result()
+		nextKeys, cursor, err = s.client.Scan(cursor, searchTerm, math.MaxInt32).Result()
 		if err != nil {
-			return nil, perr.NewErrInternal(errors.Wrap(err, "could not execute Redis command"))
+			return nil, perr.NewErrInternal(errors.Wrap(err, fmt.Sprintf("could not execute Redis SCAN %s", searchTerm)))
 		}
 
 		allKeys = append(allKeys, nextKeys...)
@@ -108,8 +109,18 @@ func (s *PropertyRedisStore) GetPropertiesByAddress(ctx context.Context, address
 		}
 	}
 
+	s.l.Info(ctx, "all keys returned while searching by address",
+		"address", address,
+		"keys", allKeys,
+	)
+
 	addrs := s.removeURLs(allKeys)
 	addrs = s.removeIDs(addrs)
+	addrs = s.removeInternalKeys(addrs)
+	s.l.Info(ctx, "filtered keys returned while searching by address",
+		"address", address,
+		"keys", addrs,
+	)
 
 	var id string
 	var prop *model.Property
@@ -182,10 +193,10 @@ func (s *PropertyRedisStore) GetPropertyIDByAddress(ctx context.Context, address
 	id, err := s.client.Get(address).Result()
 	if err != nil {
 		if err == redis.Nil {
-			return "", perr.NewErrNotFound(errors.New("address does not exist in database"))
+			return "", perr.NewErrNotFound(errors.Errorf("address %s does not exist in database", address))
 		}
 
-		return "", errors.Wrap(perr.NewErrInternal(err), "could not get id by address")
+		return "", errors.Wrap(perr.NewErrInternal(err), "could not get id by address "+address)
 	}
 
 	return id, nil
@@ -251,6 +262,22 @@ func (s *PropertyRedisStore) removeIDs(keyList []string) []string {
 	for _, key := range keyList {
 		if !strings.Contains(key, "id:") {
 			stripped = append(stripped, key)
+		}
+	}
+
+	return stripped
+}
+
+//  internal keys are keys that the db uses internally and are not meant to be exposed
+func (s *PropertyRedisStore) removeInternalKeys(keyList []string) []string {
+	internalKeys := []string{s.idCounterKey}
+
+	var stripped = make([]string, 0, len(keyList))
+	for _, key := range keyList {
+		for _, internalKey := range internalKeys {
+			if !(key == internalKey) {
+				stripped = append(stripped, key)
+			}
 		}
 	}
 

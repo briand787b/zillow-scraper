@@ -1,27 +1,31 @@
 import React from 'react';
 
+import '../styles/SearchBar.css';
+
 class SearchBar extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
             placeholder: props.placeholder,
             search: props.search,
+            handleSearch: props.handleSearch,
         };
     }
 
     onFormChanged = (event) => {
-        this.setState({ search: event.target.value })
-        console.log(event.target.value);
+        this.setState({ search: event.target.value }, () => {
+            this.state.handleSearch(this.state.search);
+        });
     };
 
+    // SearchBar continuously searches, so no need to handle submission
     onFormSubmitted = (event) => {
         event.preventDefault();
-        // this.state
     };
 
     render() {
         return (
-            <div>
+            <div className="search-bar">
                 <form onSubmit={this.onFormSubmitted}>
                     <input
                         type="text"

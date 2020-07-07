@@ -1,16 +1,15 @@
 import axios from 'axios';
 
-const maxTake = 1;
-
 class BackendClient {
     constructor(host) {
         this.host = host;
     }
 
-    async getProperties(take = 0) {
+    async getProperties(take = 0, address = '') {
         const resp = await axios.get(this.host + '/properties', {
             params: {
                 take: take,
+                address: address,
             }
         })
 
