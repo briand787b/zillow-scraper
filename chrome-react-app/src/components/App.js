@@ -3,7 +3,7 @@ import React from 'react';
 import Header from './Header';
 import BackendClient from '../api/backend';
 import Map from './Map';
-import PropertyBox from './PropertyBox';
+import PropertyList from './PropertyList';
 import SearchBar from './SearchBar';
 import '../styles/App.css';
 
@@ -23,8 +23,28 @@ class App extends React.Component {
         this.setState({ properties: properties });
     }
 
+    handleMapProperty = (property) => {
+        return () => {
+            this.setState({ mappedProperty: property });
+        }
+    }
+
+    getMapComponent() {
+        console.log('getting map component');
+        if (this.state.mappedProperty) {
+            return <Map address={this.state.mappedProperty.address}/>
+        }
+
+        if (this.state.properties && this.state.properties.length > 0) {
+            return <Map address={this.state.properties[0].address} />
+        }
+
+        console.log('no properties to map')
+        return <p>Loading...</p>
+    }
+
     render() {
-        console.log('state', this.state);
+        console.log('state', this.state);   
         return (
             <div class="content">
                 <Header />
@@ -32,10 +52,13 @@ class App extends React.Component {
                     <SearchBar handleSearch={this.handleSearch} />
                 </div>
                 <aside>
-                    <Map properties={this.state.properties} />
+                    {this.getMapComponent()}
                 </aside>
                 <main>
-                    <PropertyBox properties={this.state.properties} />
+                    <PropertyList 
+                        properties={this.state.properties} 
+                        handleMapProperty={this.handleMapProperty}
+                    />
                 </main>
             </div>
         );

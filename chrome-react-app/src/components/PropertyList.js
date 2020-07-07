@@ -9,6 +9,8 @@ const PropertyList = (props) => {
                 {props.properties.map((property) => {
                     return (<div className="property">
                         <a href={property.url}>{property.address}</a>
+                        <button onClick={props.handleMapProperty(property)}>Map</button>
+                        <p>Fav</p>
                     </div>);
                 })}
             </div>
