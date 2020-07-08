@@ -8,7 +8,7 @@
     height: 3em;
     font-size: 1rem;
     display: flex;
-    justify-content: space-evenly;
+    justify-content: flex-start;
     align-items: center;
 }
 
@@ -16,6 +16,24 @@
     background-color: lightgray;
 }
 
-.property > p:hover {
+.property p:hover {
     color: blue;
+}
+
+.property button {
+    height: 100%;
+    justify-self: center;
+    width: 40px
+}
+
+.property > * + * {
+    padding-left: 1em;
+}
+
+.property .favorite {
+    background-color: green;
+}
+
+.property .non-favorite {
+    background-color: red;
 }

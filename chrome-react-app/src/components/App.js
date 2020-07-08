@@ -39,8 +39,7 @@ class App extends React.Component {
             return <Map address={this.state.properties[0].address} />
         }
 
-        console.log('no properties to map')
-        return <p>Loading...</p>
+        return <p>no properties to map</p>
     }
 
     render() {
