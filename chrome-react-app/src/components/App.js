@@ -2,14 +2,17 @@ import React from 'react';
 
 import Header from './Header';
 import BackendClient from '../api/backend';
+import Chrome from '../api/chome';
 import Map from './Map';
 import PropertyList from './PropertyList';
 import SearchBar from './SearchBar';
+
 import '../styles/App.css';
 
 class App extends React.Component {
     state = {
         backendClient: new BackendClient('http://localhost:8080'),
+        chromeClient: new Chrome(),
         properties: [],
     };
 
