@@ -27,13 +27,17 @@
 }
 
 .property > * + * {
-    padding-left: 1em;
+    margin-left: 0.5em;
 }
 
 .property .favorite {
-    background-color: green;
+    background-color: chartreuse;
 }
 
 .property .non-favorite {
     background-color: red;
+}
+
+.mapped {
+    background-color: darkgray;
 }

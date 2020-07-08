@@ -25,25 +25,53 @@ class App extends React.Component {
 
     handleMapProperty = (property) => {
         return () => {
-            this.setState({ mappedProperty: property });
+            console.log('handling mapping - property: ', property, ' state: ', this.state);
+            const newProperties = this.state.properties.map((p) => {
+                if (p.id === property.id) {
+                    p.mapped = true;
+                    return p;
+                }
+
+                p.mapped = false;
+                return p;
+            });
+            this.setState({ properties: newProperties });
+        }
+    }
+
+    handleFavorite = (property) => {
+        return () => {
+            console.log('handling favorite - property:', property, ' state', this.state);
+            const newProperties = this.state.properties.map((p) => {
+                if (p.id === property.id) {
+                    p.favorited = true;
+                    return p;
+                }
+
+                return p;
+            });
+            this.setState({ properties: newProperties })
         }
     }
 
     getMapComponent() {
-        console.log('getting map component');
-        if (this.state.mappedProperty) {
-            return <Map address={this.state.mappedProperty.address}/>
-        }
-
+        console.log('getting map component - this.state: ', this.state);
         if (this.state.properties && this.state.properties.length > 0) {
-            return <Map address={this.state.properties[0].address} />
+            let mapped = this.state.properties.find((p) => p.mapped)
+            if (!mapped) {
+                this.handleMapProperty(this.state.properties[0])()
+                mapped = this.state.properties[0]
+            }
+            
+            console.log('mapped property: ', mapped)
+            return <Map address={mapped.address} />
         }
 
         return <p>no properties to map</p>
     }
 
     render() {
-        console.log('state', this.state);   
+        console.log('state', this.state);
         return (
             <div class="content">
                 <Header />
@@ -54,8 +82,9 @@ class App extends React.Component {
                     {this.getMapComponent()}
                 </aside>
                 <main>
-                    <PropertyList 
-                        properties={this.state.properties} 
+                    <PropertyList
+                        properties={this.state.properties}
+                        handleFavorite={this.handleFavorite}
                         handleMapProperty={this.handleMapProperty}
                     />
                 </main>
