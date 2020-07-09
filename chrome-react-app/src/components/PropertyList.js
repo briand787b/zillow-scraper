@@ -13,12 +13,15 @@ const PropertyList = (props) => {
     // set 'favorited' field on all properties that are currently favorited
     const viewProperties = props.properties.map(property => {
         const favorite  = props.favorites.find(fav => property.id === fav.id);
+        const copiedProp = { ...property }
         if (favorite !== undefined) {
-            property.favorited = true;
+            copiedProp.favorited = true;
         }
 
-        return property;
+        return copiedProp;
     });
+
+    console.log('props.properties: ', props.properties);
 
     return (
         <div className="property-list">
