@@ -14,9 +14,10 @@
 
 class Chrome {
     getFavorites() {
-        return new Promise((resolve, rejct) => {
+        return new Promise((resolve, reject) => {
             chrome.storage.sync.get(['favorites'], result => {
-                resolve(result);
+                console.log('favorites from chrome: ', result);
+                resolve(result.favorites);
             }); 
         });
     }
@@ -24,6 +25,7 @@ class Chrome {
     setFavorites(favorites) {
         return new Promise((resolve, reject) => {
             chrome.storage.sync.set({ 'favorites': favorites }, () => {
+                console.log('done setting favorites in chrome');
                 resolve();
             });
         })

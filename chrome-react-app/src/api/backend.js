@@ -1,9 +1,8 @@
 import axios from 'axios';
 
 class BackendClient {
-    constructor(host, chromeClient) {
+    constructor(host) {
         this.host = host;
-        this.chromeClient = chromeClient;
     }
 
     async getProperties(take = 0, address = '') {
@@ -18,9 +17,6 @@ class BackendClient {
         if (resp.status > 299) {
             throw new Error(`(${resp.status}) could not load properties: ` + resp.data)
         }
-
-        const favorites = await this.chromeClient.getFavorites();
-        console.log('favorites: ', favorites);
 
         return resp.data.properties;
     }

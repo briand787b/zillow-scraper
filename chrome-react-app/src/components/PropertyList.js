@@ -9,10 +9,21 @@ const capitalizeAddress = (address) => {
 
 const PropertyList = (props) => {
     console.log('rendering PropertyList - props: ', props);
+
+    // set 'favorited' field on all properties that are currently favorited
+    const viewProperties = props.properties.map(property => {
+        const favorite  = props.favorites.find(fav => property.id === fav.id);
+        if (favorite !== undefined) {
+            property.favorited = true;
+        }
+
+        return property;
+    });
+
     return (
         <div className="property-list">
             <div>
-                {props.properties.map((property) => {
+                {viewProperties.map((property) => {
                     // console.log('property: ', property);
                     const propertyClass = property.mapped ? 'property mapped' : 'property'
                     return (<div className={propertyClass}>

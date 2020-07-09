@@ -11,16 +11,20 @@ import '../styles/App.css';
 
 class App extends React.Component {
     state = {
-        backendClient: new BackendClient('http://localhost:8080', new Chrome()),
+        backendClient: new BackendClient('http://localhost:8080'),
         properties: [],
+        chromeClient: new Chrome(),
+        favorites: [],
     };
 
     async componentDidMount() {
-        const properties = await this.state.backendClient.getProperties()
-        this.setState({ properties: properties });
+        const properties = await this.state.backendClient.getProperties();
+        const favorites = await this.state.chromeClient.getFavorites();
+        this.setState({ properties: properties, favorites: favorites });
     }
 
     handleSearch = async (term) => {
+        console.log('handling search');
         const properties = await this.state.backendClient.getProperties(0, term)
         this.setState({ properties: properties });
     }
@@ -42,17 +46,23 @@ class App extends React.Component {
     }
 
     handleFavorite = (property) => {
-        return () => {
-            console.log('handling favorite - property:', property, ' state', this.state);
-            const newProperties = this.state.properties.map((p) => {
-                if (p.id === property.id) {
-                    p.favorited = true;
-                    return p;
-                }
+        return async () => {
+            console.log('handleFavorite has been triggered - property: ', property, ' state: ', this.state);
+            const oldFavorites = this.state.favorites;
+            console.log('oldFavorites: ', oldFavorites);
+            let newFavorites;
+            if (!property.favorited) {
+                console.log('adding property to favorites');
+                newFavorites = [...oldFavorites, property];
+            } else {
+                console.log('removing property from favorites');
+                newFavorites = oldFavorites.filter(fav => fav.id !== property.id);
+            }
 
-                return p;
-            });
-            this.setState({ properties: newProperties })
+            console.log('new favorites: ', newFavorites);
+            await this.state.chromeClient.setFavorites(newFavorites);
+            console.log('setting local favorites - state: ', this.state);
+            this.setState({ favorites: newFavorites });
         }
     }
 
@@ -64,7 +74,7 @@ class App extends React.Component {
                 this.handleMapProperty(this.state.properties[0])()
                 mapped = this.state.properties[0]
             }
-            
+
             console.log('mapped property: ', mapped)
             return <Map address={mapped.address} />
         }
@@ -86,6 +96,7 @@ class App extends React.Component {
                 <main>
                     <PropertyList
                         properties={this.state.properties}
+                        favorites={this.state.favorites}
                         handleFavorite={this.handleFavorite}
                         handleMapProperty={this.handleMapProperty}
                     />
