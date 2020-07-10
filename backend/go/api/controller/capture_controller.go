@@ -36,6 +36,10 @@ func (c *CaptureController) HandleCreate(w http.ResponseWriter, r *http.Request)
 	}
 
 	if err := data.c.Save(ctx, c.l, data.p, c.cs, c.ps); err != nil {
+		c.l.Error(ctx, "failed to create a capture record",
+			"request", data,
+			"error", err,
+		)
 		render.Render(w, r, perr.NewHTTPErrorFromError(ctx, err, "could not save Capture", c.l))
 		return
 	}
