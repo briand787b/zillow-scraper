@@ -47,6 +47,9 @@ func Serve(port int, l plog.Logger, cs model.CaptureStore, ps model.PropertyStor
 		r.Post("/", cc.HandleCreate)
 	})
 
+	mic := NewMiscellaneousController(r.MethodNotAllowedHandler())
+	r.MethodNotAllowed(mic.HandleMethodNotAllowed)
+
 	ctx := plog.StoreSpanIDTraceID(context.Background(), "main", "main")
 	walkFn := func(method, route string, handler http.Handler, middlewares ...func(http.Handler) http.Handler) error {
 		funcName := runtime.FuncForPC(reflect.ValueOf(handler).Pointer()).Name()
