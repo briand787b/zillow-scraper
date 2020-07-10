@@ -10,21 +10,6 @@ services:
     depends_on: 
       - backend-go
 
-  # frontend:
-  #   build: ./frontend/react
-  #   # react app exits w/ code 0 w/o this
-  #   stdin_open: true 
-  #   volumes:
-  #     - type: bind
-  #       source: ./frontend/react
-  #       target: /app
-  #   ports: 
-  #     - 3000:3000
-  #   networks: 
-  #     - public
-  #   depends_on: 
-  #     - backend-go
-
   backend-go:
     build: 
       context: ./backend/go
