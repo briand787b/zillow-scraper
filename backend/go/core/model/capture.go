@@ -59,6 +59,20 @@ type Capture struct {
 	Status Status `json:"status"`
 }
 
+// GetAllCapturesByPropertyID retrieves all Captures by Property ID
+func GetAllCapturesByPropertyID(ctx context.Context, l plog.Logger, propertyID string, cs CaptureStore) ([]Capture, error) {
+	if propertyID == "" {
+		return nil, perr.NewErrInvalid("propertyID is empty string")
+	}
+
+	caps, err := cs.GetAllCapturesByPropertyID(ctx, propertyID)
+	if err != nil {
+		return nil, errors.Wrap(err, "could not get captures from CaptureStore")
+	}
+
+	return caps, nil
+}
+
 // Save saves a Capture to the persitence layer.  It is expected to
 func (c *Capture) Save(ctx context.Context, l plog.Logger, p *Property, cs CaptureStore, ps PropertyStore) error {
 	if c.Price < 1 {

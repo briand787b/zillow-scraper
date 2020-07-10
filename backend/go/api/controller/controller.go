@@ -45,6 +45,9 @@ func Serve(port int, l plog.Logger, cs model.CaptureStore, ps model.PropertyStor
 
 	r.Route("/captures", func(r chi.Router) {
 		r.Post("/", cc.HandleCreate)
+		r.Route("/{property_id}", func(r chi.Router) {
+			r.With(cc.propertyCtx).Get("/", cc.HandleGetAllByPropertyID)
+		})
 	})
 
 	mic := NewMiscellaneousController(r.MethodNotAllowedHandler())

@@ -65,36 +65,24 @@ func (c *CaptureResponse) Render(w http.ResponseWriter, r *http.Request) error {
 
 // CaptureResponseList represents a list of Capture
 type CaptureResponseList struct {
-	Properties []CaptureResponse `json:"properties"`
-	Skip       int               `json:"skip"`
-	Take       int               `json:"take"`
-	NextSkip   int               `json:"next_skip,omitempty"`
+	Captures []CaptureResponse `json:"captures"`
 
-	ps []model.Capture
+	cs []model.Capture
 }
 
 // NewCaptureResponseList converts a slice of model.Capture into a CaptureResponseList
-func NewCaptureResponseList(mps []model.Capture, skip, take int) *CaptureResponseList {
-	return &CaptureResponseList{
-		Skip: skip,
-		Take: take,
-
-		ps: mps,
-	}
+func NewCaptureResponseList(mcs []model.Capture) *CaptureResponseList {
+	return &CaptureResponseList{cs: mcs}
 }
 
 // Render does any processing ahead of the go-chi library's rendering
 func (l *CaptureResponseList) Render(w http.ResponseWriter, r *http.Request) error {
-	l.Properties = make([]CaptureResponse, len(l.ps))
-	for i := 0; i < len(l.ps); i++ {
-		l.Properties[i] = *NewCaptureResponse(&l.ps[i])
-		if err := l.Properties[i].Render(nil, nil); err != nil {
-			return perr.NewErrInternal(errors.Wrap(err, "could not bind CaptureResponse"))
+	l.Captures = make([]CaptureResponse, len(l.cs))
+	for i := 0; i < len(l.cs); i++ {
+		l.Captures[i] = *NewCaptureResponse(&l.cs[i])
+		if err := l.Captures[i].Render(nil, nil); err != nil {
+			return perr.NewErrInternal(errors.Wrap(err, "could not bind PropertyResponse"))
 		}
-	}
-
-	if len(l.Properties) >= l.Take {
-		l.NextSkip = l.Skip + l.Take
 	}
 
 	return nil
