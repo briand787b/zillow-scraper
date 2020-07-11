@@ -10,6 +10,7 @@ import (
 	"zcrapr/core/redis"
 
 	"github.com/google/uuid"
+	"googlemaps.github.io/maps"
 )
 
 var (
@@ -34,6 +35,8 @@ func main() {
 	if err != nil {
 		log.Fatalln(err)
 	}
+
+	maps.WithAPIKey()
 
 	log.Fatalln(controller.Serve(*portFlag, l, cs, ps))
 }

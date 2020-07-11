@@ -9,6 +9,20 @@ run:
 	docker-compose up -d
 	docker-compose logs -f
 
+# opens up terminal - deps must be added manually
+add-go-deps:
+	docker image build \
+		-f ./backend/go/api/Dockerfile \
+		--target builder \
+		-t go-deps \
+		./backend/go
+	docker container run \
+		-it \
+		--rm \
+		-v ${PWD}/backend/go:/go/app/ \
+		go-deps /bin/bash
+
+
 update:
 	docker-compose kill $(service)
 	docker-compose build $(service)

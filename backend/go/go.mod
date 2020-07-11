@@ -1,6 +1,6 @@
 module zcrapr
 
-go 1.12
+go 1.14
 
 require (
 	github.com/go-chi/chi v4.1.1+incompatible
@@ -16,4 +16,5 @@ require (
 	github.com/yudai/gojsondiff v1.0.0
 	github.com/yudai/golcs v0.0.0-20170316035057-ecda9a501e82 // indirect
 	github.com/yudai/pp v2.0.1+incompatible // indirect
+	googlemaps.github.io/maps v1.2.1
 )

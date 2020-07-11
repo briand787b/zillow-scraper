@@ -1,12 +1,12 @@
 import React from 'react';
-import PropertyBoxHeader from './PropertyBoxHeader';
+import '../styles/PropertyBoxGeneral.css';
 
-const PropertyBoxDetail = (props) => {
+const PropertyBoxGeneral = (props) => {
     return (
-        <div className="property-box-detail">
+        <div className="property-box-general">
             <p>General</p>
         </div>
     )
 };
 
-export default PropertyBoxDetail;
+export default PropertyBoxGeneral;
