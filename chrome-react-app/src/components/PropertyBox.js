@@ -1,11 +1,10 @@
 import React from 'react';
-import PropertyList from './PropertyList';
 import '../styles/PropertyBox.css';
 
 const PropertyBox = (props) => {
     return (
         <div class="propert-box">
-            <PropertyList properties={props.properties} />
+            <p>Put Some Property-Specific Data Here!!!</p>
         </div>
     );
 }

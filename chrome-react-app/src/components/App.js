@@ -5,6 +5,7 @@ import BackendClient from '../api/backend';
 import Chrome from '../api/chrome';
 import Map from './Map';
 import PropertyList from './PropertyList';
+import PropertyBox from './PropertyBox';
 import SearchBar from './SearchBar';
 
 import '../styles/App.css';
@@ -101,6 +102,7 @@ class App extends React.Component {
                         handleMapProperty={this.handleMapProperty}
                     />
                 </main>
+                <PropertyBox />
             </div>
         );
     }
