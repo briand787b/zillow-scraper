@@ -16,12 +16,18 @@ class App extends React.Component {
         properties: [],
         chromeClient: new Chrome(),
         favorites: [],
+        googleMapsEmbedAPIKey: "",
     };
 
     async componentDidMount() {
         const properties = await this.state.backendClient.getProperties();
         const favorites = await this.state.chromeClient.getFavorites();
-        this.setState({ properties: properties, favorites: favorites });
+        const googleMapsEmbedAPIKey = await this.state.backendClient.getGoogleMapsEmbedAPIKey();
+        this.setState({ 
+            properties: properties, 
+            favorites: favorites, 
+            googleMapsEmbedAPIKey: googleMapsEmbedAPIKey,
+        });
     }
 
     handleSearch = async (term) => {
@@ -77,7 +83,7 @@ class App extends React.Component {
             }
 
             console.log('mapped property: ', mapped)
-            return <Map address={mapped.address} />
+            return <Map address={mapped.address} apiKey={this.state.googleMapsEmbedAPIKey}/>
         }
 
         return <p>no properties to map</p>

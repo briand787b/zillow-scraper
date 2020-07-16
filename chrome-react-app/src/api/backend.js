@@ -20,6 +20,17 @@ class BackendClient {
 
         return resp.data.properties;
     }
+
+    async getGoogleMapsEmbedAPIKey() {
+        const resp = await axios.get(this.host + '/secrets/google-maps-embed-api-key')
+        console.log('response: ', resp)
+
+        if (resp.status > 299) {
+            throw new Error(`(${resp.status}) could not load google maps embed api key`)
+        }
+
+        return resp.data.secret
+    }
 }
 
 export default BackendClient;

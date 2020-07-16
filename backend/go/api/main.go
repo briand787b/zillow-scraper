@@ -1,7 +1,6 @@
 package main
 
 import (
-	"flag"
 	"log"
 	"os"
 	"strconv"
@@ -16,25 +15,21 @@ import (
 )
 
 const (
-	portEnvVar             = "PORT"
-	redisHostEnvVar        = "REDIS_HOST"
-	googleMapsAPIKeyEnvVar = "GOOGLE_MAPS_API_KEY"
-)
-
-var (
-	portFlag = flag.Int("port", 0, "the port to listen on")
+	portEnvVar                    = "PORT"
+	redisHostEnvVar               = "REDIS_HOST"
+	googleMapsBackendAPIKeyEnvVar = "GOOGLE_MAPS_BACKEND_API_KEY"
+	googleMapsEmbedAPIKeyEnvVar   = "GOOGLE_MAPS_EMBED_API_KEY"
 )
 
 func main() {
-	flag.Parse()
-
-	log.Printf("serving from port %v\n", *portFlag)
-
 	l := plog.NewPLogger(log.New(os.Stdout, "", 0), uuid.New())
 	cs := getCaptureRedisStore(l)
 	ps := getPropertyRedisStore(l)
+	getGoogleMapsStore(getGoogleMapsBackendAPIKey())
+	embedKey := getGoogleMapsEmbedAPIKey()
+	port := getPort()
 
-	log.Fatalln(controller.Serve(getPort(), l, cs, ps))
+	log.Fatalln(controller.Serve(port, l, embedKey, cs, ps))
 }
 
 func getCaptureRedisStore(l plog.Logger) *redis.CaptureRedisStore {
@@ -47,15 +42,28 @@ func getCaptureRedisStore(l plog.Logger) *redis.CaptureRedisStore {
 	return cs
 }
 
-func getGoogleMapsStore() *googlemaps.GoogleMapStore {
-	mapsAPIKey := os.Getenv(googleMapsAPIKeyEnvVar)
+func getGoogleMapsBackendAPIKey() string {
+	mapsAPIKey := os.Getenv(googleMapsBackendAPIKeyEnvVar)
 	if mapsAPIKey == "" {
-		log.Printf("WARNING: %s is emtpy string", googleMapsAPIKeyEnvVar)
+		log.Printf("WARNING: %s is emtpy string", googleMapsBackendAPIKeyEnvVar)
 	}
 
-	client, err := maps.NewClient(maps.WithAPIKey(mapsAPIKey))
+	return mapsAPIKey
+}
+
+func getGoogleMapsEmbedAPIKey() string {
+	mapsAPIKey := os.Getenv(googleMapsEmbedAPIKeyEnvVar)
+	if mapsAPIKey == "" {
+		log.Printf("WARNING: %s is emtpy string", googleMapsEmbedAPIKeyEnvVar)
+	}
+
+	return mapsAPIKey
+}
+
+func getGoogleMapsStore(googleMapsBackendAPIKey string) *googlemaps.GoogleMapStore {
+	client, err := maps.NewClient(maps.WithAPIKey(googleMapsBackendAPIKey))
 	if err != nil {
-		log.Fatalf("ERROR: could not get google maps client by key %s\n", googleMapsAPIKeyEnvVar)
+		log.Fatalf("ERROR: could not get google maps client by key %s: %s\n", googleMapsBackendAPIKeyEnvVar, err)
 	}
 
 	return googlemaps.NewGoogleMapStore(client)

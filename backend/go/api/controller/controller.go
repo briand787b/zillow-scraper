@@ -19,8 +19,9 @@ import (
 )
 
 // Serve is a blocking function that serves HTTP
-func Serve(port int, l plog.Logger, cs model.CaptureStore, ps model.PropertyStore) error {
+func Serve(port int, l plog.Logger, googleMapsEmbedAPIKey string, cs model.CaptureStore, ps model.PropertyStore) error {
 	cc := NewCaptureController(l, cs, ps)
+	sc := NewSecretController(l, googleMapsEmbedAPIKey)
 	pc := NewPropertyController(l, ps)
 	mw, err := NewMiddleware(l, uuid.New(), os.Getenv(CorsEnvVarKey))
 	if err != nil {
@@ -48,6 +49,10 @@ func Serve(port int, l plog.Logger, cs model.CaptureStore, ps model.PropertyStor
 		r.Route("/{property_id}", func(r chi.Router) {
 			r.With(cc.propertyCtx).Get("/", cc.HandleGetAllByPropertyID)
 		})
+	})
+
+	r.Route("/secrets", func(r chi.Router) {
+		r.Get("/google-maps-embed-api-key", sc.HandleGetGoogleMapsEmbedSecret)
 	})
 
 	mic := NewMiscellaneousController(r.MethodNotAllowedHandler())
