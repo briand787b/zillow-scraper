@@ -16,8 +16,11 @@ services:
       args:
         - arch=amd64
       dockerfile: ./api/Dockerfile 
-    command: [ "/root/app", "--port", "8080" ]
+    command: [ "/root/app" ]
     environment: 
+      - GOOGLE_MAPS_API_KEY=${GOOGLE_MAPS_API_KEY}
+      - PORT=8080
+      - REDIS_HOST=redis
       - ZS_CORS_HOST=*
     ports:
       - 8080:8080
