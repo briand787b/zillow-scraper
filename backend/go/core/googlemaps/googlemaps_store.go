@@ -14,4 +14,4 @@ func NewGoogleMapStore(client *maps.Client) *GoogleMapStore {
 	return &GoogleMapStore{client: client}
 }
 
-// func (s *GoogleMapStore)
+// func (s *GoogleMapStore) PlaceAutocomplete()
