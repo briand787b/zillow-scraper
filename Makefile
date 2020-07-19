@@ -29,3 +29,27 @@ update:
 	docker-compose up -d $(service)
 	docker-compose logs -f
   
+test:
+	docker-compose \
+		-f docker-compose.yml \
+		-f docker-compose.test.yml \
+		config
+	docker-compose \
+		-f docker-compose.yml \
+		-f docker-compose.test.yml \
+		down \
+			--remove-orphans
+	-docker volume rm redis_test_data
+	docker-compose \
+		-f docker-compose.yml \
+		-f docker-compose.test.yml \
+		build
+	docker-compose \
+		-f docker-compose.yml \
+		-f docker-compose.test.yml \
+		run --rm backend-go-test
+	docker-compose \
+		-f docker-compose.yml \
+		-f docker-compose.test.yml \
+		down \
+			--remove-orphans

@@ -1,0 +1,34 @@
+version: "3.7"
+
+services:
+  backend-go-test:
+    build:
+      context: ./backend/go
+      args:
+        - arch=amd64
+      dockerfile: ./api/Dockerfile
+      target: builder
+    command: [ 
+      "go", 
+      "test",
+      "-race",
+      "./...", 
+      "-timeout",
+      "60s"
+    ]
+    environment: 
+      - GOOGLE_MAPS_BACKEND_API_KEY=${GOOGLE_MAPS_BACKEND_API_KEY}
+      - PORT=8080
+      - REDIS_HOST=redis
+      - ZS_CORS_HOST=*
+    depends_on:
+      - redis
+    networks: 
+      - private
+
+  redis:
+    volumes:
+      - redis_test_data:/data
+
+volumes: 
+  redis_test_data:

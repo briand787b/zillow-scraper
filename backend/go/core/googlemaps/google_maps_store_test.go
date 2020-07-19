@@ -103,3 +103,17 @@ func TestPlacesAutocomplete(t *testing.T) {
 
 	// t.Logf("result: %#v", result)
 }
+
+func TestFindPlaceFromText(t *testing.T) {
+	loc := getCurrentGeocode("577 Turkey Trot Rd, Clarkesville, GA 30523", t)
+	resp, err := mapClient.FindPlaceFromText(context.Background(), &maps.FindPlaceFromTextRequest{
+		Input:             "restaurant",
+		InputType:         maps.FindPlaceFromTextInputType("textquery"),
+		LocationBiasPoint: loc,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	t.Logf("%#v", resp)
+}

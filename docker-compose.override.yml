@@ -1,0 +1,9 @@
+version: "3.7"
+
+services:
+    redis:
+        volumes:
+          - redis_data:/data
+
+volumes: 
+    redis_data:
