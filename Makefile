@@ -53,3 +53,25 @@ test:
 		-f docker-compose.test.yml \
 		down \
 			--remove-orphans
+
+test-interactive:
+	docker-compose \
+		-f docker-compose.yml \
+		-f docker-compose.test.yml \
+		config
+	docker-compose \
+		-f docker-compose.yml \
+		-f docker-compose.test.yml \
+		down \
+			--remove-orphans
+	-docker volume rm redis_test_data
+	docker-compose \
+		-f docker-compose.yml \
+		-f docker-compose.test.yml \
+		build
+	docker-compose \
+		-f docker-compose.yml \
+		-f docker-compose.test.yml \
+		run \
+		-v ${PWD}/backend/go:/go/app \
+		backend-go-test /bin/bash
