@@ -19,7 +19,12 @@ build_backend:
 build_chrome_app:
   stage: build
   script:
-    - make install && docker-compose run -w /usr/local/src chrome-app npm run build
+    - docker-compose run -w /usr/local/src chrome-app npm install && npm run build
+  artifacts:
+    untracked: false
+    expire_in: 30 days
+    paths:
+      - chrome-react-app/build
 
 # test_backend:
 #   stage: test
