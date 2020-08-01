@@ -1,12 +1,14 @@
 image: docker:latest
 
-services:
-  - docker:dind
-
 before_script:
   - apk update && apk add make docker-compose
 
-build:
+build_backend:
   stage: build
   script:
-    - make build
+    - dc build backend-go
+
+# build_chrome_app:
+#   stage: build
+#   script:
+#     - 
