@@ -19,7 +19,7 @@ build_backend:
 build_chrome_app:
   stage: build
   script:
-    - docker-compose run -w /usr/local/src chrome-app npm run build
+    - make install && docker-compose run -w /usr/local/src chrome-app npm run build
 
 # test_backend:
 #   stage: test
@@ -37,6 +37,6 @@ test:
     - make test
 
 show_test_fs:
-  stage: build
+  stage: test
   script:
    - ls chrome-react-app
