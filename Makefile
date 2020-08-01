@@ -1,6 +1,11 @@
 install:
 	docker-compose build chrome-app
-	docker-compose run --rm --no-deps chrome-app npm install
+	docker-compose run \
+		--rm \
+		--no-deps \
+		 -v ${PWD}/chrome-react-app:/usr/local/src \
+		chrome-app \
+		npm install
 
 build:
 	docker-compose config
