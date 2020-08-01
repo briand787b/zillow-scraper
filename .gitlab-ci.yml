@@ -6,4 +6,4 @@ services:
 build:
   stage: build
   script:
-    - make build
+    - echo hello world
