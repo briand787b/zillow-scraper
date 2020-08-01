@@ -2,6 +2,10 @@ install:
 	docker-compose build chrome-app
 	docker-compose run --rm --no-deps chrome-app npm install
 
+build:
+	docker-compose config
+	docker-compose build
+
 run:
 	docker-compose down --remove-orphans
 	docker-compose build
