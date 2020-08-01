@@ -6,7 +6,7 @@ before_script:
 build_backend:
   stage: build
   script:
-    - dc build backend-go
+    - docker-compose build backend-go
 
 # build_chrome_app:
 #   stage: build
