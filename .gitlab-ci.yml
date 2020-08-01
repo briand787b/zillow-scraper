@@ -9,18 +9,17 @@ before_script:
 show_build_fs:
   stage: build
   script:
-    - ls
+    - ls chrome-react-app
 
 build_backend:
   stage: build
   script:
     - docker-compose build backend-go
 
-# TODO: figure out how to leave artifacts for chrome extension
-# build_chrome_app:
-#   stage: build
-#   script:
-#     - 
+build_chrome_app:
+  stage: build
+  script:
+    - docker-compose run -w /usr/local/src chrome-app npm run build
 
 # test_backend:
 #   stage: test
@@ -40,4 +39,4 @@ test:
 show_test_fs:
   stage: build
   script:
-    - ls
+   - ls chrome-react-app
