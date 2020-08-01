@@ -1,6 +1,13 @@
-FROM node:14.4
+# install application
+FROM node:14.4 as installer
+WORKDIR /usr/local/src
+COPY package*.json ./
+RUN npm install
+COPY . ./
 
 # install watchman
+FROM node:14.4 as watcher
+COPY --from=installer /usr/local/src /usr/local/src
 WORKDIR /tmp
 RUN apt-get update && \
     apt-get install -y  autoconf automake build-essential python-setuptools python-dev libssl-dev libtool && \
@@ -12,11 +19,6 @@ RUN git checkout v4.9.0 && \
     make && \
     make install
 
-# install application
-WORKDIR /usr/local/src
-COPY package*.json ./
-RUN npm install
-COPY . ./
 
 # run watchman
 RUN watchman -- trigger /usr/local/src/src rebuild '*' -- npm run build

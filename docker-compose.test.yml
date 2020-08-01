@@ -1,6 +1,14 @@
 version: "3.7"
 
 services:
+  chrome-app-test:
+    build: 
+      context: ./chrome-react-app
+      target: installer
+    command: npm test -- --watchAll=false --passWithNoTests
+    depends_on: 
+      - backend-go
+
   backend-go-test:
     build:
       context: ./backend/go

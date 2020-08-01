@@ -1,9 +1,19 @@
 version: "3.7"
 
 services:
-    redis:
-        volumes:
-          - redis_data:/data
+  chrome-app:
+    image: chrome-app-test
+    build: ./chrome-react-app
+    volumes:
+      - type: bind
+        source: ./chrome-react-app
+        target: /usr/local/src
+    depends_on: 
+      - backend-go
+
+  redis:
+      volumes:
+        - redis_data:/data
 
 volumes: 
     redis_data:

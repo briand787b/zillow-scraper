@@ -1,7 +1,7 @@
 image: docker:latest
 
-# services:
-#   - docker:dind
+services:
+  - docker:dind
 
 before_script:
   - apk update && apk add make docker-compose
@@ -11,7 +11,23 @@ build_backend:
   script:
     - docker-compose build backend-go
 
+# TODO: figure out how to leave artifacts for chrome extension
 # build_chrome_app:
 #   stage: build
 #   script:
 #     - 
+
+test_backend:
+  stage: test
+  script:
+    - make test-backend
+
+test_chrome_app:
+  stage: test
+  script:
+    - make test-chrome-app
+
+test_container_count:
+  stage: test
+  script:
+    - docker-compose ps
