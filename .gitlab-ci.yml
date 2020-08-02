@@ -17,17 +17,17 @@ test:
   script:
     - make test
 
-build_backend:
+publish_backend:
   stage: publish
   script:
     - docker-compose build backend-go
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - docker image tag backend-go $CI_REGISTRY_IMAGE/backend-go:$CI_COMMIT_SHORT_SHA
+    - docker image tag zillow-scraper_backend-go $CI_REGISTRY_IMAGE/backend-go:$CI_COMMIT_SHORT_SHA
     - docker image push $CI_REGISTRY_IMAGE/backend-go:$CI_COMMIT_SHORT_SHA
-    - docker image tag backend-go $CI_REGISTRY_IMAGE/backend-go:lastest
+    - docker image tag zillow-scraper_backend-go $CI_REGISTRY_IMAGE/backend-go:lastest
     - docker image push $CI_REGISTRY_IMAGE/backend-go:latest
 
-build_chrome_app:
+publish_chrome_app:
   stage: publish
   script:
     - docker-compose run --no-deps -w /usr/local/src chrome-app sh -c "npm install && npm run build"
