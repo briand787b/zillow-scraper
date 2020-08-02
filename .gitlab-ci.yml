@@ -15,7 +15,7 @@ before_script:
 test:
   stage: test
   script:
-    - make test
+    - echo would normally run make test
 
 publish_backend:
   stage: publish
@@ -23,9 +23,9 @@ publish_backend:
     - docker-compose build backend-go
     - docker image ls
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - docker image tag zillow-scraper_backend-go $CI_REGISTRY_IMAGE/backend-go:$CI_COMMIT_SHORT_SHA
+    - docker image tag backend-go $CI_REGISTRY_IMAGE/backend-go:$CI_COMMIT_SHORT_SHA
     - docker image push $CI_REGISTRY_IMAGE/backend-go:$CI_COMMIT_SHORT_SHA
-    - docker image tag zillow-scraper_backend-go $CI_REGISTRY_IMAGE/backend-go:lastest
+    - docker image tag backend-go $CI_REGISTRY_IMAGE/backend-go:lastest
     - docker image push $CI_REGISTRY_IMAGE/backend-go:latest
 
 publish_chrome_app:
